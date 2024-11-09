@@ -8,6 +8,7 @@ import {DeviceMotion} from 'expo-sensors';
  *
  * @returns {{slope: number, direction: number, error: string}}
  */
+
 const useSpiritLevel = () => {
     const [hasPermission, setHasPermission] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
@@ -32,25 +33,31 @@ const useSpiritLevel = () => {
     // Subscribe to DeviceMotion.
     useEffect(() => {
         if (!hasPermission || !isAvailable) {
-            DeviceMotion.addListener((motionData) => {
-                if (motionData.rotation) { // Added check for motionData.rotation
-                    const {_alpha, beta, gamma} = motionData.rotation;
-                    setOrientation({
-                        slope: toDegrees(combine(beta, gamma)).toFixed(2),
-                        direction: toDirection(beta, gamma), status: hasPermission
-                    });
-                }
-            });
+            return;
+        }
+        const listener = DeviceMotion.addListener((motionData) => {
+            if (motionData.rotation) { // Added check for motionData.rotation
+                const {alpha, beta, gamma} = motionData.rotation;
+                setOrientation({
+                    slope: toDegrees(combine(beta, gamma)).toFixed(2),
+                    direction: toDirection(beta, gamma), 
+                    status: hasPermission
+                });
+            }
+            
+        });
+
             DeviceMotion.setUpdateInterval(300); // Set the update interval to 200ms
-        }
-        if (!isAvailable) {
-            setError("laite ei saatavilla")
-        } else if (!hasPermission) {
-            setError("puuttuvia oikeuksia")
-        } else {
-            setError(null)
-        }
-        setOrientation({slope: 0, direction: 0, error})
+            if (!isAvailable) {
+                setError("laite ei saatavilla")
+            } else if (!hasPermission) {
+                setError("puuttuvia oikeuksia")
+            } else {
+                setError(null)
+            }
+        return () => {
+            listener.remove(); // Clean up the listener.
+        };
     }, [hasPermission, isAvailable]);
 
     return orientation;
