@@ -22,7 +22,8 @@ const textXOffset = 0.15 * windowDimensions.width;
 const textYOffset = 20;
 
 const SpiritLevelScreen = () => {
-    const slopeAndDirection = useSpiritLevel();
+    const [planeLocked, setPlaneLocked] = useState(false);
+    const slopeAndDirection = useSpiritLevel(planeLocked);
     const dimensions = {
         window: windowDimensions,
         screen: screenDimensions,
@@ -92,13 +93,14 @@ const SpiritLevelScreen = () => {
             <Button
                 icon={() => <Icon
                     name="lock"
-                    size={20}
+                    size={30}
                     color={theme.colors.text}
-                    source={"lock"}/>}
+                    source={planeLocked ? "lock" : "lock-open"}/>}
                 theme={theme}
                 style={styles.button}
                 buttonColor={theme.colors.innerCircle}
                 textColor={theme.colors.text}
+                onPress={() => {setPlaneLocked(!planeLocked)}}
             >Lukitse tai vapauta taso</Button>
             <View style={styles.banner}>
                 <Text
