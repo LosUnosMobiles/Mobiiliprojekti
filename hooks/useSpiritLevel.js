@@ -24,8 +24,6 @@ const useSpiritLevel = () => {
             setIsAvailable(true)
             const {status} = await DeviceMotion.requestPermissionsAsync();
             setHasPermission(status === 'granted');
-            console.log("status", status);
-            console.log("isAvailable", isAvailable);
         };
         requestPermission();
     }, []);
@@ -41,7 +39,7 @@ const useSpiritLevel = () => {
                 setOrientation({
                     slope: toDegrees(combine(beta, gamma)).toFixed(2),
                     direction: toDirection(beta, gamma), 
-                    status: hasPermission
+                    error: null
                 });
             }
             

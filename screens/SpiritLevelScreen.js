@@ -48,21 +48,15 @@ const SpiritLevelScreen = () => {
     const getPositionUsingCurrentDirection = (width, height) => {
         if (slopeAndDirection.error === null) {
             const direction = slopeAndDirection.direction; //direction in radians
-            const xVal = Math.cos(direction) * getRadius(width, height);
-            const yVal = Math.sin(direction) * getRadius(width, height);
-            return {x: xVal, y: yVal};
+            const r = getRadius(width, height);
+            const xVal = Math.cos(direction) * r;
+            const yVal = Math.sin(direction) * r;
+            return {x: width / 2 + xVal, y: height / 2 + yVal};
         }
         return {x: windowDimensions.width / 2, y: windowDimensions.width / 2};
     }
 
-    // Update indicatorPos to contain fields x and y, which contain coordinates for the direction indicator.
-    const indicatorPos = useMemo(() => {
-        if (!slopeAndDirection.error) {
-            const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width)
-            return {x: dimensions.window.width / 2, y: dimensions.window.height / 2 + y};
-        }
-        return {x: windowDimensions.width / 2, y: dimensions.window.width / 2 - 80};
-    }, [slopeAndDirection.slope, slopeAndDirection.direction])
+    const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -85,14 +79,14 @@ const SpiritLevelScreen = () => {
                         color={colorScheme.innerCircle}
                     />
                     <Circle // Indicator circle
-                        cx={indicatorPos.x}
-                        cy={indicatorPos.y}
-                        r={Math.min(dimensions.window.width, dimensions.window.width) / 20}
+                        cx={x}
+                        cy={y}
+                        r={windowDimensions.width / 20}
                         color={colorScheme.primary}
                     />
                 </Group>
                 <SkiaText x={dimensions.window.width / 2 - textXOffset} y={dimensions.window.width / 2 + textYOffset}
-                          text={slopeAndDirection.slope ?? "unreadable" + "°"} font={font}/>
+                          text={(slopeAndDirection.slope ?? "unreadable") + "°"} font={font}/>
             </Canvas>
             <View style={styles.padding}/>
             <Button
