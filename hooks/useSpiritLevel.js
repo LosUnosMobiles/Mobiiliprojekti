@@ -38,6 +38,7 @@ const useSpiritLevel = () => {
         const listener = DeviceMotion.addListener((motionData) => {
             if (motionData.rotation) { // Added check for motionData.rotation
                 const {alpha, beta, gamma} = motionData.rotation;
+                const {x,y,z} = motionData.accelerationIncludingGravity;
                 //console.log("alpha: ", alpha, "beta: ", beta, "gamma: ", gamma);
 
                 if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < Math.PI/4) {
@@ -45,59 +46,53 @@ const useSpiritLevel = () => {
                     setOrientation({
                         ...orientation, 
                         slope:toDegrees(combine(beta, gamma)).toFixed(2),
-                        direction: toDirection(beta, gamma),
-                        error:"floor" 
+                        direction: toDirection(beta, -gamma),
+                        useCase: "lattia",
+                        error:"lattia"
                     });
-                    console.log(alpha, beta, gamma);
-                } 
+                }
                 else if (Math.abs(gamma) > 3*Math.PI/4 && Math.abs(beta) < Math.PI/4) {
                     useCase="roof";
-                    if (gamma > Math.PI/2) { let gamma2 = Math.PI - gamma; }
                     setOrientation({
                         ...orientation, 
-                        slope:toDegrees(Math.abs(combine(beta, gamma)-Math.PI)).toFixed(2),
+                        slope:toDegrees(Math.abs(combine(beta, gamma))).toFixed(2),
                         direction: toDirection(beta, gamma),
-                        error:"r0f" 
+                        useCase: "katto",
+                        error:"katto"
                          
                     });
-                    console.log(alpha, beta, gamma);
-
                 } 
                 else if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < 3*Math.PI/4) {
                     useCase="frame";
                     setOrientation({
                         ...orientation, 
-                        slope:toDegrees(combine(beta, gamma)).toFixed(2),
-                        direction: toDirection(beta, gamma),
-                        error:"frame"  
+                        slope:toDegrees(beta).toFixed(2),
+                        direction: toDirection(beta, 0),
+                        useCase: "taulu",
+                        error:"taulu"
                     });
-
                 }
                 else if (Math.abs(beta) > Math.PI/4 ) {
                     useCase="wall";
                     setOrientation({
                         ...orientation, 
-                        slope:toDegrees(combine(beta,0)).toFixed(2),
-                        direction: toDirection(beta, 0),
-                        error:"wall"  
+                        slope:toDegrees(Math.abs(beta - Math.PI/2)).toFixed(2),
+                        direction: x < 0 ? Math.PI-beta : beta,
+                        useCase: "seinä",
+                        error:"seinä"
                     });
-                }
-                else {
+                } else {
                     useCase="unknown";
                     setOrientation({
                         ...orientation, 
                         slope:toDegrees(combine(beta, gamma)).toFixed(2),
                         direction: toDirection(beta, gamma),
-                        error:"floor"  
+                        useCase: "tuntematon asento",
+                        error:"tuntematon asento"
                     });
                 }
-
-                //console.log("useCase", useCase);
-
-
-
+                console.log(alpha, beta, gamma);
             }
-            
         });
 
             DeviceMotion.setUpdateInterval(2000); // Set the update interval to 200ms
@@ -117,7 +112,8 @@ const useSpiritLevel = () => {
 };
 
 const toDegrees = (radians) => (radians * 180) / Math.PI;
-const combine = (a, b) => Math.sqrt(a ** 2 + b ** 2).toFixed(2);
-const toDirection = (a, b) => Math.atan2(a, b);
+
+const combine = (a, b) => Math.sqrt(Math.sin(a)**2 + Math.sin(b)**2).toFixed(2);
+const toDirection = (a, b) => Math.atan2(Math.sin(a), Math.sin(-b));
 
 export default useSpiritLevel;
