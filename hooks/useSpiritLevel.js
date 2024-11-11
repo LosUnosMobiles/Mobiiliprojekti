@@ -15,6 +15,8 @@ const useSpiritLevel = () => {
     const [error, setError] = useState("Need sensors to be available");
     const [orientation, setOrientation] = useState({slope: 0, direction: 0, error: error});
 
+    let useCase = "";//floor, wall, frame, ceiling
+
 
     // Request permission to use DeviceMotion.
     useEffect(() => {
@@ -36,11 +38,33 @@ const useSpiritLevel = () => {
         const listener = DeviceMotion.addListener((motionData) => {
             if (motionData.rotation) { // Added check for motionData.rotation
                 const {alpha, beta, gamma} = motionData.rotation;
+                console.log("alpha: ", alpha, "beta: ", beta, "gamma: ", gamma);
+
+                if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < Math.PI/4) {
+                    useCase="floor";
+                } 
+                else if (Math.abs(gamma) > 3*Math.PI/4 && Math.abs(beta) < Math.PI/4) {
+                    useCase="roof";
+                } 
+                else if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < 3*Math.PI/4) {
+                    useCase="frame";
+                }
+                else if (Math.abs(beta) > Math.PI/4 ) {
+                    useCase="wall";
+                }
+                else {useCase="unknown";}
+
+                console.log("useCase", useCase);
+
                 setOrientation({
                     slope: toDegrees(combine(beta, gamma)).toFixed(2),
                     direction: toDirection(beta, gamma), 
-                    error: null
+                    error: useCase,
+                
                 });
+
+
+
             }
             
         });
@@ -51,7 +75,7 @@ const useSpiritLevel = () => {
             } else if (!hasPermission) {
                 setError("puuttuvia oikeuksia")
             } else {
-                setError(null)
+                setError(useCase)
             }
         return () => {
             listener.remove(); // Clean up the listener.
