@@ -47,14 +47,12 @@ const SpiritLevelScreen = () => {
      * @returns {{x: number, y: number}}
      */
     const getPositionUsingCurrentDirection = (width, height) => {
-        if (slopeAndDirection.error === null) {
-            const direction = slopeAndDirection.direction; //direction in radians
-            const r = getRadius(width, height);
-            const xVal = Math.cos(direction) * r;
-            const yVal = Math.sin(direction) * r;
-            return {x: width / 2 + xVal, y: height / 2 + yVal};
-        }
-        return {x: windowDimensions.width / 2, y: windowDimensions.width / 2};
+        
+        const direction = slopeAndDirection.direction; //direction in radians
+        const r = getRadius(width, height);
+        const xVal = Math.cos(direction) * r;
+        const yVal = Math.sin(direction) * r;
+    return {x: width / 2 + xVal, y: height / 2 + yVal};
     }
 
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);

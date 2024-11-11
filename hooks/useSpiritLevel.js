@@ -38,30 +38,61 @@ const useSpiritLevel = () => {
         const listener = DeviceMotion.addListener((motionData) => {
             if (motionData.rotation) { // Added check for motionData.rotation
                 const {alpha, beta, gamma} = motionData.rotation;
-                console.log("alpha: ", alpha, "beta: ", beta, "gamma: ", gamma);
+                //console.log("alpha: ", alpha, "beta: ", beta, "gamma: ", gamma);
 
                 if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < Math.PI/4) {
                     useCase="floor";
+                    setOrientation({
+                        ...orientation, 
+                        slope:toDegrees(combine(beta, gamma)).toFixed(2),
+                        direction: toDirection(beta, gamma),
+                        error:"floor" 
+                    });
+                    console.log(alpha, beta, gamma);
                 } 
                 else if (Math.abs(gamma) > 3*Math.PI/4 && Math.abs(beta) < Math.PI/4) {
                     useCase="roof";
+                    if (gamma > Math.PI/2) { let gamma2 = Math.PI - gamma; }
+                    setOrientation({
+                        ...orientation, 
+                        slope:toDegrees(Math.abs(combine(beta, gamma)-Math.PI)).toFixed(2),
+                        direction: toDirection(beta, gamma),
+                        error:"r0f" 
+                         
+                    });
+                    console.log(alpha, beta, gamma);
+
                 } 
                 else if (Math.abs(beta) < Math.PI/4 && Math.abs(gamma) < 3*Math.PI/4) {
                     useCase="frame";
+                    setOrientation({
+                        ...orientation, 
+                        slope:toDegrees(combine(beta, gamma)).toFixed(2),
+                        direction: toDirection(beta, gamma),
+                        error:"frame"  
+                    });
+
                 }
                 else if (Math.abs(beta) > Math.PI/4 ) {
                     useCase="wall";
+                    setOrientation({
+                        ...orientation, 
+                        slope:toDegrees(combine(beta,0)).toFixed(2),
+                        direction: toDirection(beta, 0),
+                        error:"wall"  
+                    });
                 }
-                else {useCase="unknown";}
+                else {
+                    useCase="unknown";
+                    setOrientation({
+                        ...orientation, 
+                        slope:toDegrees(combine(beta, gamma)).toFixed(2),
+                        direction: toDirection(beta, gamma),
+                        error:"floor"  
+                    });
+                }
 
-                console.log("useCase", useCase);
-
-                setOrientation({
-                    slope: toDegrees(combine(beta, gamma)).toFixed(2),
-                    direction: toDirection(beta, gamma), 
-                    error: useCase,
-                
-                });
+                //console.log("useCase", useCase);
 
 
 
@@ -69,7 +100,7 @@ const useSpiritLevel = () => {
             
         });
 
-            DeviceMotion.setUpdateInterval(300); // Set the update interval to 200ms
+            DeviceMotion.setUpdateInterval(2000); // Set the update interval to 200ms
             if (!isAvailable) {
                 setError("laite ei saatavilla")
             } else if (!hasPermission) {
