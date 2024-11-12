@@ -5,5 +5,6 @@ export default  {
     background: "#F2F2F2",
     lightText: "#fff",
     innerCircle: "#F8F2E8",
-    text: "#333333"
+    text: "#333333",
+    error: "#FF0000",
 }
