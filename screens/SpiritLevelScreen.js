@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
 import React, {useMemo, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
-import {Canvas, Circle, Group, Text as SkiaText, matchFont} from "@shopify/react-native-skia";
+import {Skia, Canvas, Circle, Group, Text as SkiaText, matchFont,vec,TextPath,Fill, Path} from "@shopify/react-native-skia";
 import {Button, Icon, IconButton, useTheme} from "react-native-paper"
 import useSpiritLevel from "../hooks/useSpiritLevel";
 
@@ -18,8 +18,13 @@ const font = matchFont(fontStyle);
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
 
-const textXOffset = 0.15 * windowDimensions.width;
-const textYOffset = 20;
+const textXOffset = 0.2 * windowDimensions.width;
+const textYOffset = 25;
+
+const size = 200;
+const path = Skia.Path.Make();
+path.moveTo(windowDimensions.width/2-textYOffset, windowDimensions.width/2-textXOffset);
+path.lineTo(windowDimensions.width/2-textYOffset, windowDimensions.width/2-textXOffset+300); // Example path
 
 const SpiritLevelScreen = () => {
     const [planeLocked, setPlaneLocked] = useState(false);
@@ -84,8 +89,15 @@ const SpiritLevelScreen = () => {
                         color={colorScheme.primary}
                     />
                 </Group>
-                <SkiaText x={dimensions.window.width / 2 - textXOffset} y={dimensions.window.width / 2 + textYOffset}
-                          text={(slopeAndDirection.slope ?? "unreadable") + "°"} font={font}/>
+                {slopeAndDirection.error !== "taulu"?<SkiaText 
+                    x={dimensions.window.width / 2 - textXOffset}
+                    y={dimensions.window.width / 2 + textYOffset}
+                    text={(slopeAndDirection.slope ?? "unreadable") + "°"} font={font}
+
+                />:
+                <Group transform={[{ rotate: -0*Math.PI }]} origin={vec(size, size)}>
+                    <TextPath font={font} path={path} text={(slopeAndDirection.slope ?? "unreadable") + "°"} font={font} />
+                </Group>}
             </Canvas>
             <View style={styles.padding}/>
             <Button

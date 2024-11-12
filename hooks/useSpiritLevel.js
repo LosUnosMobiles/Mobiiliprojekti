@@ -67,7 +67,7 @@ const useSpiritLevel = () => {
                     setOrientation({
                         ...orientation, 
                         slope:toDegrees(beta).toFixed(2),
-                        direction: toDirection(beta, 0),
+                        direction: toDirection(beta, 0.1),
                         useCase: "taulu",
                         error:"taulu"
                     });
@@ -91,7 +91,7 @@ const useSpiritLevel = () => {
                         error:"tuntematon asento"
                     });
                 }
-                console.log(alpha, beta, gamma);
+                //console.log(alpha, beta, gamma);
             }
         });
 
