@@ -46,6 +46,13 @@ const CompassScreen = () => {
 
     const getRadius = (size) => size / 2.5;
 
+    /*
+    * A temporary compass that shows what is hurts
+    * @param size size of the canvas
+    * @param heading heading in degrees
+    *
+    * */
+
     const getCompassPosition = (size, heading) => {
         const compassRadius = getRadius(size);
         const indicatorRadius = size / 20;
@@ -61,6 +68,11 @@ const CompassScreen = () => {
     const canvasSize = windowDimensions.width * 0.9;
 
     const { x, y } = getCompassPosition(canvasSize, heading);
+
+    /*
+    * @param size size of the canvas
+    * @returns {JSX.Element[]}
+    * */
 
     const renderDegreeMarkers = (size) => {
         const markers = [];
