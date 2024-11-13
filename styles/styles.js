@@ -30,5 +30,33 @@ export default StyleSheet.create({
     safeArea: {
         height: '100%',
         backgroundColor: colorScheme.background
-    }
+    },
+    container:  {
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: colorScheme.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 0,
+        padding: 0,
+    },
+    navigationButton: {
+
+        flex: 1,
+        margin: 20,
+        width: "75%",
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colorScheme.innerCircle,
+        borderRadius: 28,
+        padding: 0,
+        borderColor: colorScheme.accent,
+        borderWidth: 3,
+    },
+    buttonText: {
+        fontSize: 20, // Adjust font size as needed
+        color: colorScheme.text, // Text color
+        //textAlign: 'center',
+    },
 });
