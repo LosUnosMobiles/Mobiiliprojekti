@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 *
 * Error contains possible error message, or `null` if none.
 *
-* @returns {{direction: number, offsetNorth: number, error: string}}
+* @returns {{alpha, beta, gamma, x, y, z, direction, offsetNorth, error}}
 */
 
 const useCompass = () => {
