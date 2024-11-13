@@ -1,12 +1,29 @@
 import { DeviceMotion, Magnetometer } from "expo-sensors";
 import { useState, useEffect } from "react";
 
+/*
+* Return `direction` and `offsetNorth` polled from DeviceMotion and Magnetometer. Direction is in degrees, while offsetNorth is in radians.
+*
+* Error contains possible error message, or `null` if none.
+*
+* @returns {{direction: number, offsetNorth: number, error: string}}
+*/
 
 const useCompass = () => {
     const [hasPermission, setHasPermission] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
     const [error, setError] = useState("Need sensors to be available");
-    const [orientation, setOrientation] = useState({ direction: 0, offsetNorth: 0, error: error });
+    const [orientation, setOrientation] = useState({ 
+        alpha: 0,
+        beta: 0,
+        gamma: 0,
+        x: 0,
+        y: 0,
+        z: 0,
+        direction: 0, 
+        offsetNorth: 0, 
+        error: error 
+    });
 
     // Request permission to use DeviceMotion and Magnetometer.
     useEffect(() => {
@@ -38,10 +55,12 @@ const useCompass = () => {
         }
         const deviceMotionListener = DeviceMotion.addListener((motionData) => {
             if (motionData.rotation) { // Added check for motionData.rotation
-                const { alpha } = motionData.rotation;
+                const { alpha, beta, gamma } = motionData.rotation;
                 setOrientation((prevOrientation) => ({ // Update the orientation state
                     ...prevOrientation,
-                    direction: alpha.toFixed(2),
+                    alpha,
+                    beta,
+                    gamma,
                     error: null
                 }));
             }
@@ -67,10 +86,11 @@ const useCompass = () => {
         const magnetometerListener = Magnetometer.addListener((magnetometerData) => {
             if (magnetometerData) {
                 const { x, y, z } = magnetometerData;
-                const offsetNorth = Math.atan2(y, x);
                 setOrientation((prevOrientation) => ({ // Update the orientation state
                     ...prevOrientation,
-                    offsetNorth: offsetNorth.toFixed(2),
+                    x,
+                    y,
+                    z,
                     error: null
                 }));
             }
@@ -81,6 +101,35 @@ const useCompass = () => {
             magnetometerListener.remove(); // Clean up the listener.
         };
     },[hasPermission, isAvailable]);
+
+    // Calculate the compass heading
+    useEffect(() => {
+        if (orientation.alpha !== undefined && orientation.x !== undefined) {
+            const { alpha, beta, gamma, x, y, z } = orientation;
+
+            // Calculate the tilt compensation
+            const cosAlpha = Math.cos(alpha);
+            const sinAlpha = Math.sin(alpha);
+            const cosBeta = Math.cos(beta);
+            const sinBeta = Math.sin(beta);
+            const cosGamma = Math.cos(gamma);
+            const sinGamma = Math.sin(gamma);
+
+            const Xh = x * cosBeta + y * sinAlpha * sinBeta + z * cosAlpha * sinBeta;
+            const Yh = y * cosAlpha - z * sinAlpha;
+
+            const heading = Math.atan2(Yh, Xh) * (180 / Math.PI);
+            const correctedHeading = (heading + 360) % 360;
+
+            setOrientation((prevOrientation) => ({
+                ...prevOrientation,
+                direction: correctedHeading.toFixed(2),
+                offsetNorth: Math.atan2(y, x).toFixed(2),
+                error: null
+            }));
+        }
+    }, [orientation.alpha, orientation.x, orientation.y, orientation.z]);
+
     return orientation;
 }
 
