@@ -5,15 +5,17 @@ import {View, Text} from 'react-native';
 import style from '../styles/styles';
 import SpiritLevelScreen from './SpiritLevelScreen';
 import { Button } from 'react-native-paper';
+import {useNavigation} from "@react-navigation/native";
 
 
 export default function MenuScreen() {
+    const navigation = useNavigation();
   return (
     <View style={style.container}>
 
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}
+        onPress={() => navigation.navigate("Vatupassi")}
       >
         <Text style={style.buttonText}>Vatupassi</Text>
       </Button>

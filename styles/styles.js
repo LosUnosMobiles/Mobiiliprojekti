@@ -48,15 +48,15 @@ export default StyleSheet.create({
         height: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.innerCircle,
         borderRadius: 28,
         padding: 0,
         borderColor: colorScheme.accent,
-        borderWidth: 5, 
+        borderWidth: 3,
     },
     buttonText: {
         fontSize: 20, // Adjust font size as needed
-        color: '#ffffff', // Text color
+        color: colorScheme.text, // Text color
         //textAlign: 'center',
     },
 });
