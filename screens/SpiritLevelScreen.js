@@ -18,6 +18,7 @@ import {useTheme} from "react-native-paper"
 import useSpiritLevel from "../hooks/useSpiritLevel";
 import styles from "../styles/styles";
 import slStylesFactory from "../styles/spiritLevelStyles"
+import BottomBar from "../components/BottomBar";
 
 const fontFamily = Platform.select({ios: "Helvetica", default: "sans-serif"});
 const fontStyle = {
@@ -66,7 +67,6 @@ const SpiritLevelScreen = () => {
     }
 
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
-
     return (
         <>
             <View style={styles.padding}/>
@@ -102,11 +102,9 @@ const SpiritLevelScreen = () => {
                     </Group>}
             </Canvas>
             <View style={styles.padding}/>
-            <View style={styles.banner}>
-                <Text
-                    style={slopeAndDirection.error !== null ? styles.bannerTextError : styles.bannerText}
-                >{slopeAndDirection.error ?? slopeAndDirection.useCase}</Text>
-            </View>
+            <BottomBar
+                text={slopeAndDirection.error ?? slopeAndDirection.useCase}
+                isError={slopeAndDirection.error} />
         </>
     );
 };
