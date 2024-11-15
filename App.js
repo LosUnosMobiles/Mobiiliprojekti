@@ -5,6 +5,7 @@ import {MD3LightTheme, PaperProvider} from "react-native-paper";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import colorScheme from './styles/colorScheme';
+import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 
 const theme = {
     ...MD3LightTheme,
@@ -24,6 +25,7 @@ export default function App() {
                     {headerStyle: [{backgroundColor: colorScheme.primary}] }}>
                     <Stack.Screen name="Menu" component={MenuScreen} />
                     <Stack.Screen name="Vatupassi" component={SpiritLevelScreen} />
+                    <Stack.Screen name="Sarkalaskuri" component={FieldPatchAreaScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

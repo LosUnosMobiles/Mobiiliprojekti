@@ -59,4 +59,8 @@ export default StyleSheet.create({
         color: colorScheme.text, // Text color
         //textAlign: 'center',
     },
+    map: {
+        height: '100%',
+        width: '100%',
+    }
 });
