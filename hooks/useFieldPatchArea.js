@@ -165,9 +165,6 @@ const distanceBetween = (point1, point2) => {
     return d
 }
 
-
-
-
 export default useFieldPatchArea
 export {
     calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,

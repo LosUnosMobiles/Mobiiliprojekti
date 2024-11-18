@@ -1,6 +1,6 @@
 import useFieldPatchArea from "../useFieldPatchArea"
 import * as mod from "../useFieldPatchArea"
-import {renderHook, waitFor, act} from "@testing-library/react-native";
+import {renderHook, act} from "@testing-library/react-native";
 
 
 test("Test pushing and popping points to useFieldPatchArea", async () => {
@@ -41,7 +41,6 @@ test("Test distanceBetween() inside the hook", () => {
             longitude: 25.430291262192128, latitude: 65.0669438971005
         }
     ]
-    console.log(mod.__internal_distanceBetween(p3, p4))
  
     expect(mod.__internal_distanceBetween(p3, p4)).toBeCloseTo (698, 0.);
 })
