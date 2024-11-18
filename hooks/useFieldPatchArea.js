@@ -30,7 +30,9 @@ const useFieldPatchArea = () => {
      */
     const popPoint = () => {
         if (points.length > 0) {
-            return {...points.splice(points.length - 1, 1)[0], ordinal: points.length + 1}
+            let lastPoint={...points[points.length-1], ordinal: points.length}
+            setPoints([...points.slice(0, points.length - 1)])  
+            return lastPoint
         }
         return null
     }
@@ -142,22 +144,6 @@ const areaIsContiguous = (areaPoints) => {
  * @param point2 Is an object of form `{latitude: number, longitude: number}`
  * @returns {number} Meters
  */
-/*const distanceBetween = (point1, point2) => {
-    const deltaLatitude = point2.latitude - point1.latitude
-    const deltaLongitude = point2.longitude - point1.longitude
-    const latitudeCircumference = 40371000 * Math.cos(point1.latitude * Math.PI / 180)
-
-    const dist = Math.sqrt(
-        (deltaLatitude * latitudeCircumference / 360)**2
-        + (0*deltaLongitude * 40008000 / 360)**2
-    )
-//        (deltaLatitude * latitudeCircumference / 360)**2
-//        + (deltaLongitude * 40008000 / 360)**2
-    
-    return dist
-}*/
-
-
 
 function degreesToRadians(degrees) {
   return degrees * Math.PI / 180;
