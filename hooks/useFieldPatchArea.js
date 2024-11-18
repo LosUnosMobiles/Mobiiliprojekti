@@ -142,17 +142,44 @@ const areaIsContiguous = (areaPoints) => {
  * @param point2 Is an object of form `{latitude: number, longitude: number}`
  * @returns {number} Meters
  */
-const distanceBetween = (point1, point2) => {
+/*const distanceBetween = (point1, point2) => {
     const deltaLatitude = point2.latitude - point1.latitude
     const deltaLongitude = point2.longitude - point1.longitude
-    const latitudeCircumference = 40017560 * Math.cos(point1.latitude * Math.PI / 180)
+    const latitudeCircumference = 40371000 * Math.cos(point1.latitude * Math.PI / 180)
 
     const dist = Math.sqrt(
         (deltaLatitude * latitudeCircumference / 360)**2
-        + (deltaLongitude * 40008000 / 360)**2
+        + (0*deltaLongitude * 40008000 / 360)**2
     )
+//        (deltaLatitude * latitudeCircumference / 360)**2
+//        + (deltaLongitude * 40008000 / 360)**2
+    
     return dist
+}*/
+
+
+
+function degreesToRadians(degrees) {
+  return degrees * Math.PI / 180;
 }
+
+const distanceBetween = (point1, point2) => {
+    const R = 6371e3; // metres
+    const phi1 = point1.latitude * Math.PI/180; // φ, λ in radians
+    const phi2 = point2.latitude * Math.PI/180;
+    const deltaPhi = (point2.latitude-point1.latitude) * Math.PI/180;
+    const deltaLambda = (point2.longitude-point1.longitude) * Math.PI/180;
+
+    const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
+        Math.cos(phi1) * Math.cos(phi2) *
+        Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    const d = R * c; // in metres
+    return d
+}
+
+
 
 
 export default useFieldPatchArea
