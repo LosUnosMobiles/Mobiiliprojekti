@@ -281,11 +281,14 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
 
     // Count intersecting area lines.
     let segments = []
-    for (let i = 0; i < container.length; i++) {
+    for (let i = 0; i < container.length - 1; i++) {
         segments.push(
-            defineLineSegment(areaPoints[i - 1], areaPoints[i])
+            defineLineSegment(areaPoints[i], areaPoints[i + 1])
         )
     }
+    segments.push(
+        defineLineSegment(areaPoints[areaPoints.length-1], areaPoints[0])
+    )
     return segments.filter((a) => segmentsIntersect(ray, a)).length % 2 === 1
 }
 
