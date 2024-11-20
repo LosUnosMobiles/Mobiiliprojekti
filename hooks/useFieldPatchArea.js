@@ -250,14 +250,13 @@ const calculateLocalEarthRadius = (latitude) => {
 }
 
 /**
- * Check whether a triangle is inside or outside of given area. Error is thrown in case
- * the area is self-intersecting.
+ * Return whether a triangle is inside of given area.
  *
  * **NOTE!!** Assumes area and triangle integrity and contiguity.
  *
  * @param trianglePoints
  * @param areaPoints
- * @returns {boolean}
+ * @returns {boolean} True if inside, false if outside.
  */
 const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     // Calculate triangle mean point
