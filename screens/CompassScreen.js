@@ -1,10 +1,12 @@
+
 import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
 import { Canvas, Circle, Group, Text as SkiaText, matchFont, Line } from "@shopify/react-native-skia";
-import { Button, Icon, useTheme } from "react-native-paper";
 import * as Location from 'expo-location';
+import useCompass from "../hooks/useCompass";
+import MapView, { Marker } from "react-native-maps";
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
 const fontStyle = {
@@ -16,42 +18,51 @@ const fontStyle = {
 const font = matchFont(fontStyle);
 
 const windowDimensions = Dimensions.get('window');
-
 const textXOffset = 0.15 * windowDimensions.width;
 const textYOffset = 20;
+const canvasSize = windowDimensions.width * 0.9;
 
 const CompassScreen = () => {
+    const compassData = useCompass();
     const [heading, setHeading] = useState(0);
-    const theme = useTheme();
+    const [location, setLocation] = useState(null);
+    const [destination, setDestination] = useState(null);
 
     useEffect(() => {
-        const getHeading = async () => {
+        let locationSubscription;
+        (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                console.error('Permission to access location was denied');
+                console.log('Permission to access location was denied');
                 return;
             }
 
-            const subscription = Location.watchHeadingAsync((headingData) => {
-                setHeading(headingData.magHeading);
-            });
+            locationSubscription = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    timeInterval: 1000,
+                    distanceInterval: 1,
+                },
+                (newLocation) => {
+                    setLocation(newLocation.coords);
+                }
+            );
+        })();
 
-            return () => {
-                subscription.remove();
-            };
+        return () => {
+            if (locationSubscription) {
+                locationSubscription.remove();
+            }
         };
-
-        getHeading();
     }, []);
 
-    const getRadius = (size) => size / 2.5;
+    useEffect(() => {
+        if (compassData.direction) {
+            setHeading(parseFloat(compassData.direction));
+        }
+    }, [compassData.direction]);
 
-    /*
-    * A temporary compass that shows what is hurts
-    * @param size size of the canvas
-    * @param heading heading in degrees
-    *
-    * */
+    const getRadius = (size) => size / 2.5;
 
     const getCompassPosition = (size, heading) => {
         const compassRadius = getRadius(size);
@@ -60,24 +71,17 @@ const CompassScreen = () => {
 
         const adjustedHeading = heading - 90;
         const radians = (adjustedHeading * Math.PI) / 180;
+
         const xVal = Math.cos(radians) * effectiveRadius;
         const yVal = Math.sin(radians) * effectiveRadius;
         return { x: size / 2 + xVal, y: size / 2 + yVal };
     };
 
-    const canvasSize = windowDimensions.width * 0.9;
-
     const { x, y } = getCompassPosition(canvasSize, heading);
-
-    /*
-    * @param size size of the canvas
-    * @returns {JSX.Element[]}
-    * */
 
     const renderDegreeMarkers = (size) => {
         const markers = [];
         const compassRadius = getRadius(size);
-        const indicatorRadius = size / 20;
         const tickLength = 10;
 
         for (let degree = 0; degree <= 360; degree += 10) {
@@ -90,7 +94,6 @@ const CompassScreen = () => {
             const innerX = size / 2 + (compassRadius + 10 - currentTickLength) * Math.cos(radians);
             const innerY = size / 2 + (compassRadius + 10 - currentTickLength) * Math.sin(radians);
 
-            // Draw tick lines
             markers.push(
                 <Line
                     key={`tick-${degree}`}
@@ -101,7 +104,6 @@ const CompassScreen = () => {
                 />
             );
 
-            // Increase the number of degrees in increments of 20 degrees
             if (isMajorTick && degree !== 360) {
                 const textRadius = compassRadius + 20;
                 const textX = size / 2 + textRadius * Math.cos(radians);
@@ -119,7 +121,7 @@ const CompassScreen = () => {
                             fontStyle: "normal",
                             fontWeight: "bold",
                         })}
-                        color={colorScheme.lightText}
+                        color="black"
                     />
                 );
             }
@@ -135,8 +137,42 @@ const CompassScreen = () => {
                 <Text style={styles.bannerText}>Compass</Text>
             </View>
 
-            {/* Canvas component*/}
+            {/* Map and Compass Container */}
             <View style={styles.canvasContainer}>
+                <MapView
+                    style={styles.map}
+                    region={
+                        location
+                            ? {
+                                latitude: location.latitude,
+                                longitude: location.longitude,
+                                latitudeDelta: 0.005,
+                                longitudeDelta: 0.005,
+                            }
+                            : {
+                                latitude: 37.78825,
+                                longitude: -122.4324,
+                                latitudeDelta: 0.0922,
+                                longitudeDelta: 0.0421,
+                            }
+                    }
+                    showsUserLocation={true}
+                    showsMyLocationButton={true}
+                    onPress={(e) => {
+                        const { latitude, longitude } = e.nativeEvent.coordinate;
+                        setDestination({ latitude, longitude }); // Updating the destination state
+                    }}
+                >
+                    {/* Add a marker to the map if the destination is defined */}
+                    {destination && (
+                        <Marker
+                            coordinate={{ latitude: destination.latitude, longitude: destination.longitude }}
+                            title="Kohde"
+                            description="Tämä on merkin sijainti"
+                        />
+                    )}
+                </MapView>
+
                 <Canvas style={styles.canvas}>
                     <Group>
                         {/* Rim*/}
@@ -145,13 +181,15 @@ const CompassScreen = () => {
                             cy={canvasSize / 2}
                             r={getRadius(canvasSize) + 10}
                             color={colorScheme.accent}
+                            //color= 'black'
+                            //color={colorScheme.transparentBackground}
                         />
-                        {/* Inner ciccle*/}
+                        {/* Inner circle*/}
                         <Circle
                             cx={canvasSize / 2}
                             cy={canvasSize / 2}
                             r={getRadius(canvasSize) - 10}
-                            color={colorScheme.innerCircle}
+                            color={colorScheme.transparentBackground}
                         />
                         {/* Indicator circle*/}
                         <Circle
@@ -159,38 +197,25 @@ const CompassScreen = () => {
                             cy={y}
                             r={canvasSize / 20}
                             color={colorScheme.primary}
+                            //color= 'black'
                         />
                         {/* Degrees and lines */}
                         {renderDegreeMarkers(canvasSize)}
                     </Group>
-                    {/* Text showing compass direction */}
-                    {/*<SkiaText*/}
-                    {/*    x={canvasSize / 2 - textXOffset}*/}
-                    {/*    y={canvasSize / 2 + textYOffset}*/}
-                    {/*    text={`${Math.round(heading)}°`}*/}
-                    {/*    font={font}*/}
-                    {/*    color={colorScheme.lightText}*/}
-                    {/*/>*/}
+                    {/*Text showing compass direction*/}
+                    <SkiaText
+                        x={canvasSize / 2 - textXOffset}
+                        y={canvasSize / 2 + textYOffset}
+                        text={`${Math.round(heading)}°`}
+                        font={font}
+                        color="black"
+                    />
                 </Canvas>
             </View>
 
-            {/* Button component */}
-            {/*
-            <Button
-                icon={() => <Icon name="compass-outline" size={30} color={theme.colors.text} />}
-                theme={theme}
-                style={styles.button}
-                buttonColor={colorScheme.innerCircle}
-                textColor={theme.colors.text}
-                onPress={() => {}}
-            >
-                Päivitä suunta
-            </Button>
-            */}
-
             {/* BottomBar */}
             <View style={styles.footerBanner}>
-                {/*<Text style={styles.bannerText}>/!* Slope error message *!/</Text>*/}
+
             </View>
         </SafeAreaView>
     );
@@ -200,15 +225,8 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: colorScheme.background,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
     },
     banner: {
-        backgroundColor: colorScheme.primary,
-        width: "100%",
-        alignItems: "center",
-    },
-    footerBanner: {
         backgroundColor: colorScheme.primary,
         width: "100%",
         alignItems: "center",
@@ -221,20 +239,26 @@ const styles = StyleSheet.create({
     },
     canvasContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        position: 'relative',
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
     },
     canvas: {
-        backgroundColor: colorScheme.background,
-        width: windowDimensions.width * 0.9,
-        height: windowDimensions.width * 0.9,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: [
+            { translateX: -canvasSize / 2 },
+            { translateY: -canvasSize / 2 },
+        ],
+        width: canvasSize,
+        height: canvasSize,
     },
-    button: {
-        marginBottom: 40,
-        marginHorizontal: 40,
-        paddingVertical: 20,
-        borderWidth: 2,
-        borderColor: colorScheme.accent,
+    footerBanner: {
+        backgroundColor: colorScheme.primary,
+        width: "100%",
+        alignItems: "center",
     },
 });
 

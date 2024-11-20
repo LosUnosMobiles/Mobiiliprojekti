@@ -123,10 +123,12 @@ const useCompass = () => {
 
             setOrientation((prevOrientation) => ({
                 ...prevOrientation,
-                direction: correctedHeading.toFixed(2),
-                offsetNorth: Math.atan2(y, x).toFixed(2),
+                direction: heading.toFixed(2),
+                offsetNorth: Math.atan2(Math.sin(y), Math.sin(x)).toFixed(2),
+                //offsetNorth: Math.atan2(y, x).toFixed(2),
                 error: null
             }));
+            //console.log(`Heading (corrected): ${heading}, Xh: ${Xh}, Yh: ${Yh}`);  //added for debugging
         }
     }, [orientation.alpha, orientation.x, orientation.y, orientation.z]);
 
