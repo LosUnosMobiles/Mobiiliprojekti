@@ -175,29 +175,28 @@ const CompassScreen = () => {
 
                 <Canvas style={styles.canvas}>
                     <Group>
-                        {/* Rim*/}
+                        {/* Ring*/}
                         <Circle
                             cx={canvasSize / 2}
                             cy={canvasSize / 2}
                             r={getRadius(canvasSize) + 10}
                             color={colorScheme.accent}
-                            //color= 'black'
-                            //color={colorScheme.transparentBackground}
+                            style = "stroke"
+                            strokeWidth={30}
                         />
                         {/* Inner circle*/}
-                        <Circle
-                            cx={canvasSize / 2}
-                            cy={canvasSize / 2}
-                            r={getRadius(canvasSize) - 10}
-                            color={colorScheme.transparentBackground}
-                        />
+                        {/*<Circle*/}
+                        {/*    cx={canvasSize / 2}*/}
+                        {/*    cy={canvasSize / 2}*/}
+                        {/*    r={getRadius(canvasSize) - 10}*/}
+                        {/*    color={colorScheme.transparentBackground}*/}
+                        {/*/>*/}
                         {/* Indicator circle*/}
                         <Circle
                             cx={x}
                             cy={y}
                             r={canvasSize / 20}
                             color={colorScheme.primary}
-                            //color= 'black'
                         />
                         {/* Degrees and lines */}
                         {renderDegreeMarkers(canvasSize)}
