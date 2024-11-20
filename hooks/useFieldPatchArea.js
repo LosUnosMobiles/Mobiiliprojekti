@@ -92,10 +92,10 @@ const calculateAreaOfTriangle = (p1, p2, p3) => {
     const d2 = distanceBetween(p2, p3)
     const d3 = distanceBetween(p3, p1)
     const s = (d1 + d2 + d3) / 2
+    console.log(`s: ${s}, d:${d1}, d:${d2}, d3:${d3}`)
     const area = Math.sqrt(s*(s-d1)*(s-d2)*(s-d3))
     return area
 }
-
 
 /**
  * Return 0 if a and b are the same within tolerance.

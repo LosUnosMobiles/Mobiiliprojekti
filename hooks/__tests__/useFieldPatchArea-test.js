@@ -88,4 +88,19 @@ describe("useFieldPatchArea", () => {
 
         expect(mod.__internal_calculateLocalEarthRadius(latitude)).toBeCloseTo (6360569,0);
     })
+
+    test("calculateAreaOfTriangle() inside the hook", () => { //calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,
+        const [p1, p2, p3] = [//alue 300m * 400m
+            { 
+                longitude: 25.472575661607674, latitude:  65.05573889248743 //65.05573889248743, 25.472575661607674
+            }, {
+                longitude: 25.472507101708246 , latitude: 65.05920837121779 //65.05920837121779, 25.472507101708246
+            }, {
+                longitude: 25.465993911263123, latitude:  65.0554401106946//65.0554401106946, 25.465993911263123
+            }
+        ]
+
+        expect(mod.__internal_calculateAreaOfTriangle(p1,p2, p3)).toBeCloseTo (59396, 0.);
+    })
+
 })
