@@ -114,7 +114,28 @@ const floatCmp = (a, b, tolerance) => {
 }
 
 /**
- * Return `true` if lines *a1->a2* and *b1->b2* intersect.
+ * Line segments intersect.
+ *
+ * See defineLineSegment() to see how to get one of those.
+ *
+ * @param a line segment
+ * @param b line segment
+ * @returns {boolean}
+ */
+const segmentsIntersect = (a, b) => {
+    if (floatCmp(a.k, b.k, 0.0005) !== 0) {
+        const x = -(b.b-a.b) / (b.k-a.k)
+        if (x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
+            return true
+        }
+    }
+    return false
+}
+
+
+/**
+ * Return `true` if lines from **points** *a1->a2* and *b1->b2* intersect.
+ *
  * @param a1 Is an object like `{latitude: number, longitude: number}`
  * @param a2 Same as a1
  * @param b1 Same as a1
@@ -122,26 +143,10 @@ const floatCmp = (a, b, tolerance) => {
  * @return boolean
  */
 const isIntersect = (a1, a2, b1, b2) => {
-    /**
-     * Companion function for defineLineSegment.
-     * @param a line segment
-     * @param b line segment
-     * @returns {boolean}
-     */
-    const doesIntersect = (a, b) => {
-        if (floatCmp(a.k, b.k, 0.0005) !== 0) {
-            const x = -(b.b-a.b) / (b.k-a.k)
-            if (x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
-                return true
-            }
-        }
-        return false
-    }
-
     // Define line segments.
     const seg0 = defineLineSegment(a1, a2)
     const seg1 = defineLineSegment(b1, b2)
-    const retVal = doesIntersect(seg0, seg1)
+    const retVal = segmentsIntersect(seg0, seg1)
     return retVal
 }
 
@@ -245,33 +250,44 @@ const calculateLocalEarthRadius = (latitude) => {
 }
 
 /**
- * Check whether a triangle is inside or outside of a given area. Error is thrown in case
+ * Check whether a triangle is inside or outside of given area. Error is thrown in case
  * the area is self-intersecting.
+ *
+ * **NOTE!!** Assumes area and triangle integrity and contiguity.
  *
  * @param trianglePoints
  * @param areaPoints
  * @returns {boolean}
- *
- * @throws "self-intersecting-area" Invalid area, which is self-intersecting.
- * @throws "triangle-intersects-area" Given triangle intersects one or more of the area boundary line segments.
  */
 const triangleIsInsideArea = (trianglePoints, areaPoints) => {
-    // TODO: 1) Calculate triangle mean point
+    // Calculate triangle mean point
     const meanPoint = trianglePoints
-        .map(point => (
-            { latitude: point.latitude / trianglePoints.length, longitude: point.longitude / trianglePoints.length }))
-        .reduce((acc, point) => (
-            {latitude: acc.latitude + point.latitude, longitude: acc.longitude + point.longitude}
-        ), {latitude: 0, longitude: 0})
+        .map(point => ({
+            latitude: point.latitude / trianglePoints.length,
+            longitude: point.longitude / trianglePoints.length
+        }))
+        .reduce((acc, point) => ({
+                latitude: acc.latitude + point.latitude,
+                longitude: acc.longitude + point.longitude
+        }), {latitude: 0, longitude: 0})
 
-    // TODO: 2) Draw containing rectangle aka. container.
+    // Draw containing rectangle aka. container.
     const container = generateContainer(areaPoints)
 
-    // TODO: 3) Define line segment right from mean point along the latitude axis.
-    const ray =
+    // Define line segment right from mean point along the latitude axis.
+    const ray = defineLineSegment(
+        meanPoint,
+        {...meanPoint, longitude: container[container.length - 1].longitude},
+    )
 
-    // TODO: 4) Go right from the mean point, and count intersecting area lines.
-    return true
+    // Count intersecting area lines.
+    let segments = []
+    for (let i = 0; i < container.length; i++) {
+        segments.push(
+            defineLineSegment(areaPoints[i - 1], areaPoints[i])
+        )
+    }
+    return segments.filter((a) => segmentsIntersect(ray, a)).length % 2 === 1
 }
 
 /**
