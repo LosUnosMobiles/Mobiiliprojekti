@@ -92,7 +92,6 @@ const calculateAreaOfTriangle = (p1, p2, p3) => {
     const d2 = distanceBetween(p2, p3)
     const d3 = distanceBetween(p3, p1)
     const s = (d1 + d2 + d3) / 2
-    console.log(`s: ${s}, d:${d1}, d:${d2}, d3:${d3}`)
     const area = Math.sqrt(s*(s-d1)*(s-d2)*(s-d3))
     return area
 }
@@ -181,12 +180,12 @@ const isIntersect = (a1, a2, b1, b2) => {
  */
 const areaIsContiguous = (areaPoints) => {
     let copy = [...areaPoints]
-    const a = areaPoints[0]
+
     if (copy.length >= 3) {
         const newestLine = areaPoints.slice(areaPoints.length - 2)
         const [np1, np2] = newestLine
 
-        for (let i = 0; i <= copy.length - 2; i++) {
+        for (let i = 0; i < copy.length - 3; i++) {
             const cmpLine = isIntersect(np1, np2, copy[i], copy[i + 1])
             if (cmpLine) {
                 return false
