@@ -122,33 +122,6 @@ const floatCmp = (a, b, tolerance) => {
  * @return boolean
  */
 const isIntersect = (a1, a2, b1, b2) => {
-    const bConstant = (x, y, k) => -k*x + y // y = kx + b <=> -b = kx - y <=> b = -kx + y
-
-    /**
-     * Define line segment using two points.
-     *
-     * `plotFunc` contained in the returned object gives y value on given x value.
-     * @param p1 {latitude: number, longitude: number}, latitude being Y-component and longitude X-component.
-     * @param p2
-     * @returns {{b: number, plotFunc: ((function(*): (*|null))|*), k: number, xMax: number, xMin: number}}
-     */
-    const defineLineSegment = (p1, p2) => {
-        const deltaY = p1.latitude - p2.latitude
-        const deltaX = p1.longitude - p2.longitude
-        const k = deltaY / deltaX
-        const b = bConstant(p1.longitude, p1.latitude, k)
-        const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
-        return {
-            k, b, xMin, xMax,
-            plotFunc: (x) => {
-                if (x > xMin && x < xMax) {
-                    return k*x + b
-                }
-                return null
-            },
-        }
-    }
-
     /**
      * Companion function for defineLineSegment.
      * @param a line segment
@@ -170,6 +143,40 @@ const isIntersect = (a1, a2, b1, b2) => {
     const seg1 = defineLineSegment(b1, b2)
     const retVal = doesIntersect(seg0, seg1)
     return retVal
+}
+
+/**
+ * Define constant `b` for a line going through point `x` and `y`, and having slope `k`
+ * @param x
+ * @param y
+ * @param k
+ * @returns {*}
+ */
+const bConstant = (x, y, k) => -k*x + y // y = kx + b <=> -b = kx - y <=> b = -kx + y
+
+/**
+ * Define line segment using two points.
+ *
+ * `plotFunc` contained in the returned object gives y value on given x value.
+ * @param p1 {latitude: number, longitude: number}, latitude being Y-component and longitude X-component.
+ * @param p2
+ * @returns {{b: number, plotFunc: ((function(*): (*|null))|*), k: number, xMax: number, xMin: number}}
+ */
+const defineLineSegment = (p1, p2) => {
+    const deltaY = p1.latitude - p2.latitude
+    const deltaX = p1.longitude - p2.longitude
+    const k = deltaY / deltaX
+    const b = bConstant(p1.longitude, p1.latitude, k)
+    const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
+    return {
+        k, b, xMin, xMax,
+        plotFunc: (x) => {
+            if (x > xMin && x < xMax) {
+                return k*x + b
+            }
+            return null
+        },
+    }
 }
 
 /**
@@ -261,6 +268,7 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     const container = generateContainer(areaPoints)
 
     // TODO: 3) Define line segment right from mean point along the latitude axis.
+    const ray =
 
     // TODO: 4) Go right from the mean point, and count intersecting area lines.
     return true
