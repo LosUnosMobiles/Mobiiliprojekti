@@ -250,8 +250,18 @@ const calculateLocalEarthRadius = (latitude) => {
  */
 const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     // TODO: 1) Calculate triangle mean point
+    const meanPoint = trianglePoints
+        .map(point => (
+            { latitude: point.latitude / trianglePoints.length, longitude: point.longitude / trianglePoints.length }))
+        .reduce((acc, point) => (
+            {latitude: acc.latitude + point.latitude, longitude: acc.longitude + point.longitude}
+        ), {latitude: 0, longitude: 0})
+
     // TODO: 2) Draw containing rectangle aka. container.
+    const container = generateContainer(areaPoints)
+
     // TODO: 3) Define line segment right from mean point along the latitude axis.
+
     // TODO: 4) Go right from the mean point, and count intersecting area lines.
     return true
 }
