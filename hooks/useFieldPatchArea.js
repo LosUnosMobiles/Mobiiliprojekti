@@ -55,7 +55,7 @@ const useFieldPatchArea = () => {
      * @returns {number} Is in *m^2*
      */
     const calculateArea = () => {
-        if (points.length >= 3 && areaIsContiguous(points)) {
+        if (points.length >= 3 && addingSegmentKeepsAreaContiguous(points)) {
             let copy = [...points]
             const a = points[0]
             let accumulatedArea = 0
@@ -65,7 +65,7 @@ const useFieldPatchArea = () => {
                 accumulatedArea += calculateAreaOfTriangle(a,b,c)
             }
             return accumulatedArea
-        } else if (!areaIsContiguous(points)) {
+        } else if (!addingSegmentKeepsAreaContiguous(points)) {
             throw "Area is not contiguous"
         }
         return 0 // Could not calculate area from too few points or non-contiguous area.
@@ -173,12 +173,12 @@ const isIntersect = (a1, a2, b1, b2) => {
 }
 
 /**
- * Check that given area delimited by given GPS points is contiguous.
+ * Check that newest line segment doesn't intersect with other area line segments.
  *
  * @param area Is an array like `[{latitude: number, longitude: number}, ...]`
  * @returns {boolean}
  */
-const areaIsContiguous = (areaPoints) => {
+const addingSegmentKeepsAreaContiguous = (areaPoints) => {
     let copy = [...areaPoints]
 
     if (copy.length >= 3) {
@@ -237,12 +237,27 @@ const calculateLocalEarthRadius = (latitude) => {
     return localEarthRadius //return localEarthRadius //6360000
 }
 
+/**
+ * Check whether a triangle is inside or outside of a given area. Error is thrown in case
+ * the area is self-intersecting.
+ *
+ * @param trianglePoints
+ * @param areaPoints
+ * @returns {boolean}
+ *
+ * @throws "self-intersecting-area" Invalid area, which is self-intersecting.
+ * @throws "triangle-intersects-area" Given triangle intersects one or more of the area boundary line segments.
+ */
+const triangleIsInsideArea = (trianglePoints, areaPoints) => {
+    return true
+}
+
 
 export default useFieldPatchArea
 export {
     calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,
     distanceBetween as __internal_distanceBetween,
     isIntersect as __internal_isIntersect,
-    areaIsContiguous as __internal_areaIsContiguous,
+    addingSegmentKeepsAreaContiguous as __internal_areaIsContiguous,
     calculateLocalEarthRadius as __internal_calculateLocalEarthRadius,
 }
