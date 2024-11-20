@@ -249,7 +249,35 @@ const calculateLocalEarthRadius = (latitude) => {
  * @throws "triangle-intersects-area" Given triangle intersects one or more of the area boundary line segments.
  */
 const triangleIsInsideArea = (trianglePoints, areaPoints) => {
+    // TODO: 1) Calculate triangle mean point
+    // TODO: 2) Draw containing rectangle aka. container.
+    // TODO: 3) Define line segment right from mean point along the latitude axis.
+    // TODO: 4) Go right from the mean point, and count intersecting area lines.
     return true
+}
+
+/**
+ * Define a containing rectangle around specified area.
+ *
+ * @param areaPoints {[{latitude, longitude}]} List of points defining the area to be contained.
+ * @returns {[{latitude, longitude}, {latitude, longitude}, {latitude, longitude}, {latitude, longitude}]}
+ */
+const generateContainer = (areaPoints) => {
+    let minX = null
+    let minY = null
+    let maxX = null
+    let maxY = null
+    areaPoints.forEach((p) => {
+        minX = minX ?? p.latitude <= p.latitude ? minX ?? p.latitude : p.latitude
+        minY = minY ?? p.longitude <= p.longitude ? minY ?? p.longitude : p.longitude
+        maxX = maxX ?? p.latitude >= p.latitude ? maxX ?? p.latitude : p.latitude
+        maxY = maxY ?? p.longitude >= p.longitude ? maxY ?? p.longitude : p.longitude
+    })
+    const topLeft = {latitude: maxY, longitude: minX}
+    const bottomLeft = {latitude: minY, longitude: minX}
+    const bottomRight = {latitude: minY, longitude: maxX}
+    const topRight = {latitude: maxY, longitude: maxX}
+    return [topLeft, bottomLeft, bottomRight, topRight]
 }
 
 
