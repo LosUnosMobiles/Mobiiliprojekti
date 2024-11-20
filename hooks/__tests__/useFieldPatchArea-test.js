@@ -44,4 +44,42 @@ describe("useFieldPatchArea", () => {
 
         expect(mod.__internal_distanceBetween(p3, p4)).toBeCloseTo (698, 0.);
     })
+
+    test("Test isIntersect()", () => {
+        const [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12] = [
+            {latitude:61.481094434555665, longitude:23.495311370637737}, // l1
+            {latitude:61.48189587371329, longitude:23.497395796547806},
+
+            {latitude:61.48096408865421, longitude:23.497606083763515}, // l2, **l1 and l2 should intersect**
+            {latitude:61.482200092117274, longitude:23.4948504390831},
+
+            {latitude:61.482200092117274, longitude:23.4948504390831}, // l3, **l1 and l3 should not intersect**
+            {latitude:61.47969452699654, longitude:23.494732574090232},//     **l2 and l3 should not intersect**
+
+            {latitude:61.480661940226476, longitude:23.497039359096625}, // l4
+            {latitude:61.48212713346468, longitude:23.494558224718293},
+
+            {latitude: -1, longitude: 1}, // l5
+            {latitude: 1, longitude: -1},
+
+            {latitude: -1, longitude: -1}, // l6
+            {latitude: 1, longitude: 1},
+
+        ]
+        const [l1, l2, l3, l4, l5, l6] =(
+            [[p1,p2],[p3,p4],[p5,p6], [p7,p8], [p9,p10], [p11,p12]]
+        )
+
+        // l1 and l2 should not intersect
+        expect(mod.__internal_isIntersect(l1[0], l1[1], l2[0], l2[1])).toBe(true)
+
+        // l1 and l3 should not intersect
+        expect(mod.__internal_isIntersect(l1[0], l1[1], l3[0], l3[1])).toBe(false)
+
+        // l2 and l3 should not intersect
+        expect(mod.__internal_isIntersect(l2[0], l2[1], l3[0], l3[1])).toBe(false)
+
+       // l1 and l4 should intersect
+        expect(mod.__internal_isIntersect(l5[0], l5[1], l6[0], l6[1])).toBe(true)
+    })
 })

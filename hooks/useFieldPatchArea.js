@@ -96,22 +96,92 @@ const calculateAreaOfTriangle = (p1, p2, p3) => {
     return area
 }
 
+
+/**
+ * Return 0 if a and b are the same within tolerance.
+ * Return >0 if b>a.
+ * Return <0 if a>b.
+ *
+ * @param a
+ * @param b
+ * @param tolerance Defaults to 0.005
+ * @returns {number}
+ */
+const floatCmp = (a, b, tolerance) => {
+    if (a < b + (tolerance ?? 0.005) && a > b - (tolerance && 0.005)) {
+        return 0
+    }
+    return a - b
+}
+
 /**
  * Return `true` if lines *a1->a2* and *b1->b2* intersect.
- * @param a1 Is an object like `{longitude: number, latitude: number}`
+ * @param a1 Is an object like `{latitude: number, longitude: number}`
  * @param a2 Same as a1
  * @param b1 Same as a1
  * @param b2 Same as a1
  * @return boolean
  */
 const isIntersect = (a1, a2, b1, b2) => {
-    const ccw = (p1, p2, p3) => {
-        return (
-            (p3.longitude - p1.latitude) * (p2.longitude - p1.longitude)
-            > (p2.longitude - p1.longitude) * (p3.longitude - p1.longitude)
-        )
+    const bConstant = (x, y, k) => -k*x + y // y = kx + b <=> -b = kx - y <=> b = -kx + y
+
+    /**
+     * Define line segment using two points.
+     *
+     * `plotFunc` contained in the returned object gives y value on given x value.
+     * @param p1 {latitude: number, longitude: number}, latitude being Y-component and longitude X-component.
+     * @param p2
+     * @returns {{b: number, plotFunc: ((function(*): (*|null))|*), k: number, xMax: number, xMin: number}}
+     */
+    const defineLineSegment = (p1, p2) => {
+        const deltaY = p1.latitude - p2.latitude
+        const deltaX = p1.longitude - p2.longitude
+        const k = deltaY / deltaX
+        const b = bConstant(p1.longitude, p1.latitude, k)
+        const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
+        return {
+            k, b, xMin, xMax,
+            plotFunc: (x) => {
+                if (x > xMin && x < xMax) {
+                    return k*x + b
+                }
+                return null
+            },
+        }
     }
-    return ccw(a1, b1, b2) !== ccw(a2, b1, b2) && ccw(a1, a2, b1) !== ccw(a1, b1, b2)
+
+    /**
+     * Companion function for defineLineSegment.
+     * @param a line segment
+     * @param b line segment
+     * @returns {boolean}
+     */
+    const doesIntersect = (a, b) => {
+        // y_0 = k_0*x_0 + b_0
+        // y_1 = k_1*x_1 + b_1
+        //
+        // a.k * a.x + a.b = other.k * other.x + other.b
+        // y = y
+        if (floatCmp(a.k, b.k, 0.005) !== 0) {
+            const x = -(b.b-a.b) / (b.k-a.k)
+            console.log("Cutting point:", x)
+            console.log("Both lines defined in range:", Math.max(a.xMin, b.xMin), ",", Math.min(a.xMax, b.xMax))
+            console.log("Point a:", a)
+            console.log("Point b:", b)
+
+            if (a.k !== b.k && x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
+                return true
+            }
+        }
+        return false
+    }
+
+
+    // Define line segments.
+    const seg0 = defineLineSegment(a1, a2)
+    const seg1 = defineLineSegment(b1, b2)
+    const retVal = doesIntersect(seg0, seg1)
+    return retVal
 }
 
 /**
