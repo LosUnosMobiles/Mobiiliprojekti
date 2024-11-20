@@ -7,6 +7,8 @@ import { Canvas, Circle, Group, Text as SkiaText, matchFont, Line } from "@shopi
 import * as Location from 'expo-location';
 import useCompass from "../hooks/useCompass";
 import MapView, { Marker } from "react-native-maps";
+import renderDegreeMarkers from "../utils/renderDegreeMarkers";
+import CustomMapView from "../components/CustomMapView";
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
 const fontStyle = {
@@ -79,56 +81,19 @@ const CompassScreen = () => {
 
     const { x, y } = getCompassPosition(canvasSize, heading);
 
-    const renderDegreeMarkers = (size) => {
-        const markers = [];
-        const compassRadius = getRadius(size);
-        const tickLength = 10;
-
-        for (let degree = 0; degree <= 360; degree += 10) {
-            const radians = (degree - 90) * (Math.PI / 180);
-            const isMajorTick = degree % 20 === 0;
-            const currentTickLength = isMajorTick ? tickLength + 5 : tickLength;
-
-            const outerX = size / 2 + (compassRadius + 10) * Math.cos(radians);
-            const outerY = size / 2 + (compassRadius + 10) * Math.sin(radians);
-            const innerX = size / 2 + (compassRadius + 10 - currentTickLength) * Math.cos(radians);
-            const innerY = size / 2 + (compassRadius + 10 - currentTickLength) * Math.sin(radians);
-
-            markers.push(
-                <Line
-                    key={`tick-${degree}`}
-                    p1={{ x: innerX, y: innerY }}
-                    p2={{ x: outerX, y: outerY }}
-                    strokeWidth={2}
-                    color={colorScheme.lightText}
-                />
-            );
-
-            if (isMajorTick && degree !== 360) {
-                const textRadius = compassRadius + 20;
-                const textX = size / 2 + textRadius * Math.cos(radians);
-                const textY = size / 2 + textRadius * Math.sin(radians) + 10;
-
-                markers.push(
-                    <SkiaText
-                        key={`label-${degree}`}
-                        x={textX - 10}
-                        y={textY}
-                        text={`${degree}°`}
-                        font={matchFont({
-                            fontFamily,
-                            fontSize: 20,
-                            fontStyle: "normal",
-                            fontWeight: "bold",
-                        })}
-                        color="black"
-                    />
-                );
-            }
+    const region = location
+        ? {
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
         }
-
-        return markers;
-    };
+        : {
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -139,39 +104,14 @@ const CompassScreen = () => {
 
             {/* Map and Compass Container */}
             <View style={styles.canvasContainer}>
-                <MapView
-                    style={styles.map}
-                    region={
-                        location
-                            ? {
-                                latitude: location.latitude,
-                                longitude: location.longitude,
-                                latitudeDelta: 0.005,
-                                longitudeDelta: 0.005,
-                            }
-                            : {
-                                latitude: 37.78825,
-                                longitude: -122.4324,
-                                latitudeDelta: 0.0922,
-                                longitudeDelta: 0.0421,
-                            }
-                    }
-                    showsUserLocation={true}
-                    showsMyLocationButton={true}
-                    onPress={(e) => {
+                <CustomMapView
+                    region={region}
+                    destination={destination}
+                    onMapPress={(e) => {
                         const { latitude, longitude } = e.nativeEvent.coordinate;
-                        setDestination({ latitude, longitude }); // Updating the destination state
+                        setDestination({ latitude, longitude });
                     }}
-                >
-                    {/* Add a marker to the map if the destination is defined */}
-                    {destination && (
-                        <Marker
-                            coordinate={{ latitude: destination.latitude, longitude: destination.longitude }}
-                            title="Kohde"
-                            description="Tämä on merkin sijainti"
-                        />
-                    )}
-                </MapView>
+                />
 
                 <Canvas style={styles.canvas}>
                     <Group>
@@ -184,14 +124,7 @@ const CompassScreen = () => {
                             style = "stroke"
                             strokeWidth={30}
                         />
-                        {/* Inner circle*/}
-                        {/*<Circle*/}
-                        {/*    cx={canvasSize / 2}*/}
-                        {/*    cy={canvasSize / 2}*/}
-                        {/*    r={getRadius(canvasSize) - 10}*/}
-                        {/*    color={colorScheme.transparentBackground}*/}
-                        {/*/>*/}
-                        {/* Indicator circle*/}
+                        {/* Indicator point on the circumference */}
                         <Circle
                             cx={x}
                             cy={y}
