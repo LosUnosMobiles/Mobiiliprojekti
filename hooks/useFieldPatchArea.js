@@ -157,25 +157,14 @@ const isIntersect = (a1, a2, b1, b2) => {
      * @returns {boolean}
      */
     const doesIntersect = (a, b) => {
-        // y_0 = k_0*x_0 + b_0
-        // y_1 = k_1*x_1 + b_1
-        //
-        // a.k * a.x + a.b = other.k * other.x + other.b
-        // y = y
-        if (floatCmp(a.k, b.k, 0.005) !== 0) {
+        if (floatCmp(a.k, b.k, 0.0005) !== 0) {
             const x = -(b.b-a.b) / (b.k-a.k)
-            console.log("Cutting point:", x)
-            console.log("Both lines defined in range:", Math.max(a.xMin, b.xMin), ",", Math.min(a.xMax, b.xMax))
-            console.log("Point a:", a)
-            console.log("Point b:", b)
-
-            if (a.k !== b.k && x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
+            if (x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
                 return true
             }
         }
         return false
     }
-
 
     // Define line segments.
     const seg0 = defineLineSegment(a1, a2)
@@ -214,7 +203,6 @@ const areaIsContiguous = (areaPoints) => {
  * @param point2 Is an object of form `{latitude: number, longitude: number}`
  * @returns {number} Meters
  */
-
 function degreesToRadians(degrees) {
   return degrees * Math.PI / 180;
 }
