@@ -42,7 +42,7 @@ describe("useFieldPatchArea", () => {
             }
         ]
 
-        expect(mod.__internal_distanceBetween(p3, p4)).toBeCloseTo (698, 0.);
+        expect(mod.__internal_distanceBetween(p3, p4)).toBeCloseTo (697, 0.);
     })
 
     test("Test isIntersect()", () => {
@@ -81,5 +81,11 @@ describe("useFieldPatchArea", () => {
 
        // l1 and l4 should intersect
         expect(mod.__internal_isIntersect(l5[0], l5[1], l6[0], l6[1])).toBe(true)
+    })
+    
+    test("Test calculateLocalEarthRadius() inside the hook", () => {
+        const latitude = 65.1
+
+        expect(mod.__internal_calculateLocalEarthRadius(latitude)).toBeCloseTo (6360569,0);
     })
 })

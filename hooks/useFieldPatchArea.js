@@ -208,7 +208,7 @@ function degreesToRadians(degrees) {
 }
 
 const distanceBetween = (point1, point2) => {
-    const R = 6371e3; // metres
+    const R = calculateLocalEarthRadius(point1.latitude) //about 6360000 metres
     const phi1 = point1.latitude * Math.PI/180; // φ, λ in radians
     const phi2 = point2.latitude * Math.PI/180;
     const deltaPhi = (point2.latitude-point1.latitude) * Math.PI/180;
@@ -223,10 +223,27 @@ const distanceBetween = (point1, point2) => {
     return d
 }
 
+/**
+ * Calculate local Earth radius at given latitude.  
+ * @param latitude
+ * @returns {number} in meters
+ */
+const calculateLocalEarthRadius = (latitude) => {
+    const radiusEquator = 6378137.0 //  is the radius of Earth at the equator, approximately 6378137 m
+    const radiusPolar = 6356752.3 // is the radius of Earth at the pole, approximately 6356752 m
+    const phi = degreesToRadians(latitude) //latitude in degrees
+    const numerator = (radiusEquator**2 * Math.cos(phi))**2 + (radiusPolar**2 * Math.sin(phi))**2
+    const denominator = (radiusEquator * Math.cos(phi))**2 + (radiusPolar * Math.sin(phi))**2
+    const localEarthRadius = Math.sqrt(numerator / denominator)
+    return localEarthRadius //return localEarthRadius //6360000
+}
+
+
 export default useFieldPatchArea
 export {
     calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,
     distanceBetween as __internal_distanceBetween,
     isIntersect as __internal_isIntersect,
     areaIsContiguous as __internal_areaIsContiguous,
+    calculateLocalEarthRadius as __internal_calculateLocalEarthRadius,
 }
