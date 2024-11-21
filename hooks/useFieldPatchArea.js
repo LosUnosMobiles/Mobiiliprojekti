@@ -55,7 +55,7 @@ const useFieldPatchArea = () => {
      * @returns {number} Is in *m^2*
      */
     const calculateArea = () => {
-        if (points.length >= 3 && areaIsContiguous(points)) {
+        if (points.length >= 3 && addingSegmentKeepsAreaContiguous(points)) {
             let copy = [...points]
             const a = points[0]
             let accumulatedArea = 0
@@ -65,7 +65,7 @@ const useFieldPatchArea = () => {
                 accumulatedArea += calculateAreaOfTriangle(a,b,c)
             }
             return accumulatedArea
-        } else if (!areaIsContiguous(points)) {
+        } else if (!addingSegmentKeepsAreaContiguous(points)) {
             throw "Area is not contiguous"
         }
         return 0 // Could not calculate area from too few points or non-contiguous area.
@@ -114,7 +114,28 @@ const floatCmp = (a, b, tolerance) => {
 }
 
 /**
- * Return `true` if lines *a1->a2* and *b1->b2* intersect.
+ * Line segments intersect.
+ *
+ * See defineLineSegment() to see how to get one of those.
+ *
+ * @param a line segment
+ * @param b line segment
+ * @returns {boolean}
+ */
+const segmentsIntersect = (a, b) => {
+    if (floatCmp(a.k, b.k, 0.0005) !== 0) {
+        const x = -(b.b-a.b) / (b.k-a.k)
+        if (x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
+            return true
+        }
+    }
+    return false
+}
+
+
+/**
+ * Return `true` if lines from **points** *a1->a2* and *b1->b2* intersect.
+ *
  * @param a1 Is an object like `{latitude: number, longitude: number}`
  * @param a2 Same as a1
  * @param b1 Same as a1
@@ -122,63 +143,54 @@ const floatCmp = (a, b, tolerance) => {
  * @return boolean
  */
 const isIntersect = (a1, a2, b1, b2) => {
-    const bConstant = (x, y, k) => -k*x + y // y = kx + b <=> -b = kx - y <=> b = -kx + y
-
-    /**
-     * Define line segment using two points.
-     *
-     * `plotFunc` contained in the returned object gives y value on given x value.
-     * @param p1 {latitude: number, longitude: number}, latitude being Y-component and longitude X-component.
-     * @param p2
-     * @returns {{b: number, plotFunc: ((function(*): (*|null))|*), k: number, xMax: number, xMin: number}}
-     */
-    const defineLineSegment = (p1, p2) => {
-        const deltaY = p1.latitude - p2.latitude
-        const deltaX = p1.longitude - p2.longitude
-        const k = deltaY / deltaX
-        const b = bConstant(p1.longitude, p1.latitude, k)
-        const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
-        return {
-            k, b, xMin, xMax,
-            plotFunc: (x) => {
-                if (x > xMin && x < xMax) {
-                    return k*x + b
-                }
-                return null
-            },
-        }
-    }
-
-    /**
-     * Companion function for defineLineSegment.
-     * @param a line segment
-     * @param b line segment
-     * @returns {boolean}
-     */
-    const doesIntersect = (a, b) => {
-        if (floatCmp(a.k, b.k, 0.0005) !== 0) {
-            const x = -(b.b-a.b) / (b.k-a.k)
-            if (x > Math.max(a.xMin, b.xMin) && x < Math.min(a.xMax, b.xMax)) {
-                return true
-            }
-        }
-        return false
-    }
-
     // Define line segments.
     const seg0 = defineLineSegment(a1, a2)
     const seg1 = defineLineSegment(b1, b2)
-    const retVal = doesIntersect(seg0, seg1)
+    const retVal = segmentsIntersect(seg0, seg1)
     return retVal
 }
 
 /**
- * Check that given area delimited by given GPS points is contiguous.
+ * Define constant `b` for a line going through point `x` and `y`, and having slope `k`
+ * @param x
+ * @param y
+ * @param k
+ * @returns {*}
+ */
+const bConstant = (x, y, k) => -k*x + y
+
+/**
+ * Define line segment using two points.
+ *
+ * `plotFunc` contained in the returned object gives y value on given x value.
+ * @param p1 {latitude: number, longitude: number}, latitude being Y-component and longitude X-component.
+ * @param p2
+ * @returns {{b: number, plotFunc: ((function(*): (*|null))|*), k: number, xMax: number, xMin: number}}
+ */
+const defineLineSegment = (p1, p2) => {
+    const deltaY = p1.latitude - p2.latitude
+    const deltaX = p1.longitude - p2.longitude
+    const k = deltaY / deltaX
+    const b = bConstant(p1.longitude, p1.latitude, k)
+    const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
+    return {
+        k, b, xMin, xMax,
+        plotFunc: (x) => {
+            if (x > xMin && x < xMax) {
+                return k*x + b
+            }
+            return null
+        },
+    }
+}
+
+/**
+ * Check that newest line segment doesn't intersect with other area line segments.
  *
  * @param area Is an array like `[{latitude: number, longitude: number}, ...]`
  * @returns {boolean}
  */
-const areaIsContiguous = (areaPoints) => {
+const addingSegmentKeepsAreaContiguous = (areaPoints) => {
     let copy = [...areaPoints]
 
     if (copy.length >= 3) {
@@ -237,12 +249,85 @@ const calculateLocalEarthRadius = (latitude) => {
     return localEarthRadius //return localEarthRadius //6360000
 }
 
+/**
+ * Return whether a triangle is inside of given area.
+ *
+ * - **NOTE!!** Assumes area and triangle integrity and contiguity.
+ * - **NOTE2!!** Assumes the given triangle is *wholly* inside or outside.
+ *
+ * Reasoning for the note 2 is, that the area slicing algorithm forms triangles wholly inside or outside
+ * the worked area. Thus, there is no need to know if a triangle is only partially inside.
+ *
+ * @param trianglePoints
+ * @param areaPoints
+ * @returns {boolean} True if inside, false if outside.
+ */
+const triangleIsInsideArea = (trianglePoints, areaPoints) => {
+    // Calculate triangle mean point
+    const meanPoint = trianglePoints
+        .map(point => ({
+            latitude: point.latitude / trianglePoints.length,
+            longitude: point.longitude / trianglePoints.length
+        }))
+        .reduce((acc, point) => ({
+                latitude: acc.latitude + point.latitude,
+                longitude: acc.longitude + point.longitude
+        }), {latitude: 0, longitude: 0})
+
+    // Draw containing rectangle aka. container.
+    const container = generateContainer(areaPoints)
+
+    // Define line segment right from mean point along the latitude axis.
+    const ray = defineLineSegment(
+        meanPoint,
+        {...meanPoint, longitude: container[container.length - 1].longitude},
+    )
+
+    // Count intersecting area lines.
+    let segments = []
+    for (let i = 0; i < container.length - 1; i++) {
+        segments.push(
+            defineLineSegment(areaPoints[i], areaPoints[i + 1])
+        )
+    }
+    segments.push(
+        defineLineSegment(areaPoints[areaPoints.length-1], areaPoints[0])
+    )
+    return segments.filter((a) => segmentsIntersect(ray, a)).length % 2 === 1
+}
+
+/**
+ * Define a containing rectangle around specified area.
+ *
+ * @param areaPoints {[{latitude, longitude}]} List of points defining the area to be contained.
+ * @returns {[{latitude, longitude}, {latitude, longitude}, {latitude, longitude}, {latitude, longitude}]}
+ */
+const generateContainer = (areaPoints) => {
+    let minX = null
+    let minY = null
+    let maxX = null
+    let maxY = null
+    areaPoints.forEach((p) => {
+        minX = (minX ?? p.longitude) <= p.longitude ? (minX ?? p.longitude) : p.longitude
+        minY = (minY ?? p.latitude) <= p.latitude ? (minY ?? p.latitude) : p.latitude
+        maxX = (maxX ?? p.longitude) >= p.longitude ? (maxX ?? p.longitude) : p.longitude
+        maxY = (maxY ?? p.latitude) >= p.latitude ? (maxY ?? p.latitude) : p.latitude
+    })
+    const topLeft = {latitude: maxY, longitude: minX}
+    const bottomLeft = {latitude: minY, longitude: minX}
+    const bottomRight = {latitude: minY, longitude: maxX}
+    const topRight = {latitude: maxY, longitude: maxX}
+    return [topLeft, bottomLeft, bottomRight, topRight]
+}
+
 
 export default useFieldPatchArea
 export {
     calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,
     distanceBetween as __internal_distanceBetween,
     isIntersect as __internal_isIntersect,
-    areaIsContiguous as __internal_areaIsContiguous,
+    addingSegmentKeepsAreaContiguous as __internal_areaIsContiguous,
     calculateLocalEarthRadius as __internal_calculateLocalEarthRadius,
+    generateContainer as __internal_generateContainer,
+    triangleIsInsideArea as __internal_triangleIsInsideArea,
 }
