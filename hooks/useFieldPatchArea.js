@@ -252,7 +252,11 @@ const calculateLocalEarthRadius = (latitude) => {
 /**
  * Return whether a triangle is inside of given area.
  *
- * **NOTE!!** Assumes area and triangle integrity and contiguity.
+ * - **NOTE!!** Assumes area and triangle integrity and contiguity.
+ * - **NOTE2!!** Assumes the given triangle is *wholly* inside or outside.
+ *
+ * Reasoning for the note 2 is, that the area slicing algorithm forms triangles wholly inside or outside
+ * the worked area. Thus, there is no need to know if a triangle is only partially inside.
  *
  * @param trianglePoints
  * @param areaPoints

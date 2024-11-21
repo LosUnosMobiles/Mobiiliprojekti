@@ -128,13 +128,13 @@ describe("useFieldPatchArea", () => {
         // Kokonaisala: 29 970,37 m² (322 598,40 ft²)
         // Kokonaisetäisyys: 709,37 m (2 327,31 ft)
         const areaPoints = [
-            {latitude: 61.48198978573224, longitude: 23.494089554015307}, // 61.48198978573224, 23.494089554015307
-            {latitude: 61.48269373858714, longitude: 23.496701462253842}, // 61.48269373858714, 23.496701462253842
-            {latitude: 61.48151209437239, longitude: 23.498544542664106}, // 61.48151209437239, 23.498544542664106
-            {latitude: 61.48070754498803, longitude: 23.497038482671723}, // 61.48070754498803, 23.497038482671723
-            {latitude: 61.48050137586181, longitude: 23.496080080858388}, // 61.48050137586181, 23.496080080858388
-            {latitude: 61.48075782993367, longitude: 23.49560614589575}, // 61.48075782993367, 23.49560614589575
-            {latitude: 61.480938855065496, longitude: 23.495827315544975}, // 61.480938855065496, 23.495827315544975
+            {latitude: 61.48198978573224, longitude: 23.494089554015307},
+            {latitude: 61.48269373858714, longitude: 23.496701462253842},
+            {latitude: 61.48151209437239, longitude: 23.498544542664106},
+            {latitude: 61.48070754498803, longitude: 23.497038482671723},
+            {latitude: 61.48050137586181, longitude: 23.496080080858388},
+            {latitude: 61.48075782993367, longitude: 23.49560614589575},
+            {latitude: 61.480938855065496, longitude: 23.495827315544975},
         ]
         const container = mod.__internal_generateContainer(areaPoints)
         const [xmin, xmax, ymin, ymax] = [
@@ -148,4 +148,34 @@ describe("useFieldPatchArea", () => {
         ])
     })
 
+    test("Test triangleIsInsideArea()", () => {
+        // Kokonaisala: 29 970,37 m² (322 598,40 ft²)
+        // Kokonaisetäisyys: 709,37 m (2 327,31 ft)
+        const areaPoints = [
+            {latitude: 61.48198978573224, longitude: 23.494089554015307},
+            {latitude: 61.48269373858714, longitude: 23.496701462253842},
+            {latitude: 61.48151209437239, longitude: 23.498544542664106},
+            {latitude: 61.48070754498803, longitude: 23.497038482671723},
+            {latitude: 61.48050137586181, longitude: 23.496080080858388},
+            {latitude: 61.48075782993367, longitude: 23.49560614589575},
+            {latitude: 61.480938855065496, longitude: 23.495827315544975},
+        ]
+        const t1 = [ // Is fully inside
+            {latitude: 61.48143666875083, longitude: 23.495785187992748},
+            {latitude: 61.48187916312212, longitude: 23.496153804074797},
+            {latitude: 61.48126570333207, longitude: 23.49720699288066},
+        ]
+        // const t2 = [ // Is only partially inside
+        //     {latitude: 61.48143666875083, longitude: 23.495785187992748},
+        //     {latitude: 61.48299542779507, longitude: 23.496132740298684},
+        //     {latitude: 61.48126570333207, longitude: 23.49720699288066},
+        // ]
+        const t3 = [ // Is fully outside
+            {latitude: 61.48340270358817, longitude: 23.49498476450029},
+            {latitude: 61.48299542779507, longitude: 23.496132740298684},
+            {latitude: 61.48367924584251, longitude: 23.497249120432894},
+        ]
+        expect(mod.__internal_triangleIsInsideArea(t1, areaPoints)).toBe(true)
+        expect(mod.__internal_triangleIsInsideArea(t3, areaPoints)).toBe(false)
+    })
 })
