@@ -70,8 +70,12 @@ const useFieldPatchArea = () => {
             let accumulatedArea = 0
             while (copy.length >= 3) {
                 const [b, c] = copy.slice(copy.length-2)
+                if (triangleIsInsideArea([a,b,c], copy)) {
+                    accumulatedArea += calculateAreaOfTriangle(a,b,c)
+                } else { // outside
+                    accumulatedArea -= calculateAreaOfTriangle(a,b,c)
+                }
                 copy.splice(copy.length-1, 1)
-                accumulatedArea += calculateAreaOfTriangle(a,b,c)
             }
             return accumulatedArea
         } else if (!addingSegmentKeepsAreaContiguous(points)) {
@@ -310,7 +314,9 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
 
     // Count intersecting area lines.
     let segments = []
-    for (let i = 0; i < container.length; i++) {
+    for (let i = 0; i < areaPoints.length-1; i++) {
+        // console.log(container[i])
+        // console.log(container[i+1])
         segments.push(
             defineLineSegment(areaPoints[i], areaPoints[i + 1])
         )
@@ -318,6 +324,7 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     segments.push(
         defineLineSegment(areaPoints[areaPoints.length-1], areaPoints[0])
     )
+
     return segments.map((a) => ([
         segmentsIntersect(rays[0], a) ? 1 : 0,
         segmentsIntersect(rays[1], a) ? 1 : 0,

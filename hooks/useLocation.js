@@ -37,7 +37,6 @@ export default function useLocation() {
             getCurrentLocation()
                 .then((loc) => {
                     setLocation(loc.coords)
-                    console.log(loc)
                 })
         }, 3500)
 
