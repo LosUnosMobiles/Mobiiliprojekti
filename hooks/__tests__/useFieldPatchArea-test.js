@@ -124,5 +124,28 @@ describe("useFieldPatchArea", () => {
         expect(mod.__internal_areaIsContiguous([p1, p2, p3, p4])).toBe(true);
     })
 
+    test("Test generateContainer()", () => {
+        // Kokonaisala: 29 970,37 m² (322 598,40 ft²)
+        // Kokonaisetäisyys: 709,37 m (2 327,31 ft)
+        const areaPoints = [
+            {latitude: 61.48198978573224, longitude: 23.494089554015307}, // 61.48198978573224, 23.494089554015307
+            {latitude: 61.48269373858714, longitude: 23.496701462253842}, // 61.48269373858714, 23.496701462253842
+            {latitude: 61.48151209437239, longitude: 23.498544542664106}, // 61.48151209437239, 23.498544542664106
+            {latitude: 61.48070754498803, longitude: 23.497038482671723}, // 61.48070754498803, 23.497038482671723
+            {latitude: 61.48050137586181, longitude: 23.496080080858388}, // 61.48050137586181, 23.496080080858388
+            {latitude: 61.48075782993367, longitude: 23.49560614589575}, // 61.48075782993367, 23.49560614589575
+            {latitude: 61.480938855065496, longitude: 23.495827315544975}, // 61.480938855065496, 23.495827315544975
+        ]
+        const container = mod.__internal_generateContainer(areaPoints)
+        const [xmin, xmax, ymin, ymax] = [
+            23.494089554015307, 23.498544542664106, 61.48050137586181, 61.48269373858714
+        ]
+        expect(container).toEqual([
+            {latitude: ymax, longitude: xmin},
+            {latitude: ymin, longitude: xmin},
+            {latitude: ymin, longitude: xmax},
+            {latitude: ymax, longitude: xmax},
+        ])
+    })
 
 })

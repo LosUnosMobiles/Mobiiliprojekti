@@ -157,7 +157,7 @@ const isIntersect = (a1, a2, b1, b2) => {
  * @param k
  * @returns {*}
  */
-const bConstant = (x, y, k) => -k*x + y // y = kx + b <=> -b = kx - y <=> b = -kx + y
+const bConstant = (x, y, k) => -k*x + y
 
 /**
  * Define line segment using two points.
@@ -304,10 +304,10 @@ const generateContainer = (areaPoints) => {
     let maxX = null
     let maxY = null
     areaPoints.forEach((p) => {
-        minX = minX ?? p.latitude <= p.latitude ? minX ?? p.latitude : p.latitude
-        minY = minY ?? p.longitude <= p.longitude ? minY ?? p.longitude : p.longitude
-        maxX = maxX ?? p.latitude >= p.latitude ? maxX ?? p.latitude : p.latitude
-        maxY = maxY ?? p.longitude >= p.longitude ? maxY ?? p.longitude : p.longitude
+        minX = (minX ?? p.longitude) <= p.longitude ? (minX ?? p.longitude) : p.longitude
+        minY = (minY ?? p.latitude) <= p.latitude ? (minY ?? p.latitude) : p.latitude
+        maxX = (maxX ?? p.longitude) >= p.longitude ? (maxX ?? p.longitude) : p.longitude
+        maxY = (maxY ?? p.latitude) >= p.latitude ? (maxY ?? p.latitude) : p.latitude
     })
     const topLeft = {latitude: maxY, longitude: minX}
     const bottomLeft = {latitude: minY, longitude: minX}
@@ -324,4 +324,6 @@ export {
     isIntersect as __internal_isIntersect,
     addingSegmentKeepsAreaContiguous as __internal_areaIsContiguous,
     calculateLocalEarthRadius as __internal_calculateLocalEarthRadius,
+    generateContainer as __internal_generateContainer,
+    triangleIsInsideArea as __internal_triangleIsInsideArea,
 }
