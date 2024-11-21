@@ -95,6 +95,18 @@ describe("useFieldPatchArea", () => {
         expect(mod.__internal_distanceBetween(p3, p4)).toBeCloseTo (697, 0.);
     })
 
+    test("Test distanceBetween() inside the hook", () => {
+        const [p1, p2] = [
+            {
+                longitude: 25.46509875665957, latitude:  65.02034409496977//Raatti urheilukenttä rata 1 starts
+            }, {
+                longitude: 25.465002628077194 , latitude: 65.01944685934953//Raatti urheilukenttä rata 1 100m
+            }
+        ]
+
+        expect(mod.__internal_distanceBetween(p1, p2)).toBeCloseTo (100, 0.);
+    })
+
     test("Test isIntersect()", () => {
         const [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12] = [
             {latitude:61.481094434555665, longitude:23.495311370637737}, // l1
