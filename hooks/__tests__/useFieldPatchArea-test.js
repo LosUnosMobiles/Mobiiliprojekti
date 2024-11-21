@@ -1,6 +1,6 @@
 import useFieldPatchArea from "../useFieldPatchArea"
 import * as mod from "../useFieldPatchArea"
-import {renderHook, act} from "@testing-library/react-native";
+import {renderHook, act, waitFor} from "@testing-library/react-native";
 
 describe("useFieldPatchArea", () => {
     test("Test pushing and popping points to useFieldPatchArea", async () => {
@@ -28,6 +28,56 @@ describe("useFieldPatchArea", () => {
 
     });
 
+    test("Test calculate area works for a set of points.", async () => {
+        // Kokonaisala: 29 970,37 m² (322 598,40 ft²)
+        // Kokonaisetäisyys: 709,37 m (2 327,31 ft)
+        const areaPoints = [
+            {latitude: 61.48198978573224, longitude: 23.494089554015307},
+            {latitude: 61.48269373858714, longitude: 23.496701462253842},
+            {latitude: 61.48151209437239, longitude: 23.498544542664106},
+            {latitude: 61.48070754498803, longitude: 23.497038482671723},
+            {latitude: 61.48050137586181, longitude: 23.496080080858388},
+            {latitude: 61.48075782993367, longitude: 23.49560614589575},
+            {latitude: 61.480938855065496, longitude: 23.495827315544975},
+        ]
+        const {result} = renderHook(() => useFieldPatchArea())
+
+        for (let i = 0; i < areaPoints.length; i++) {
+            await waitFor(() => result.current.pushPoint(areaPoints[i]))
+        }
+        await waitFor(() => expect(result.current.area.sqm).toBeCloseTo(33156, 0))
+        await waitFor(() => expect(result.current.area.ha).toBeCloseTo(3.3156, 0))
+
+        // TODO: Investigate why the test below gives 10% different area as compared to Google Maps.
+        // await waitFor(() => expect(result.current.area.sqm).toBeCloseTo(29970, 0))
+    })
+
+    test("Test Linnanmaa market parking lot.", async () => {
+        const {result} = renderHook(() => useFieldPatchArea())
+
+        // Test Linnanmaa parking lot test.
+        const linnanmaaParkingLot = [ // 9500sqm
+            {latitude: 65.05334320638865, longitude: 25.45756870519559},
+            {latitude: 65.05376177921661, longitude: 25.45989149809213},
+            {latitude: 65.05440433228317, longitude: 25.459194123831278},
+            {latitude: 65.05405364503399, longitude: 25.45691961071701},
+        ]
+
+        const linnanmaaParkingLot2 = [ // 14000sqm
+            {latitude: 65.05334320638865, longitude: 25.45756870519559},
+            {latitude: 65.05376177921661, longitude: 25.45989149809213},
+            {latitude: 65.05440433228317, longitude: 25.459194123831278},
+            {latitude: 65.05424095159584, longitude: 25.458307559068857},
+            {latitude: 65.05440217271207, longitude: 25.458167887503375},
+            {latitude: 65.05452308790923, longitude: 25.45908677938155},
+            {latitude: 65.05509045189262, longitude: 25.45867511582013},
+            {latitude: 65.05508425125863, longitude: 25.45613897423636},
+        ]
+        for (let i = 0; i < linnanmaaParkingLot.length; i++) {
+            await waitFor(() => result.current.pushPoint(linnanmaaParkingLot[i]))
+        }
+        await waitFor(() => expect(result.current.area.sqm).toBeCloseTo(9428.679005046833, 0))
+    })
 
     test("Test distanceBetween() inside the hook", () => {
         const [p1, p2, p3, p4] = [

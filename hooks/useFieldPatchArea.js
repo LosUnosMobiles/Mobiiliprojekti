@@ -38,6 +38,15 @@ const useFieldPatchArea = () => {
     }
 
     /**
+     * Return state variable containing points.
+     *
+     * @returns {*[]}
+     */
+    const getPoints = () => {
+        return points
+    }
+
+    /**
      * Re-calculate area when points change.
      */
     useEffect(() => {
