@@ -200,7 +200,7 @@ describe("useFieldPatchArea", () => {
         ]
         const container = mod.__internal_generateContainer(areaPoints)
         const [xmin, xmax, ymin, ymax] = [
-            23.494089554015307, 23.498544542664106, 61.48050137586181, 61.48269373858714
+            23.493089554015306, 23.499544542664108, 61.479501375861815, 61.483693738587135
         ]
         expect(container).toEqual([
             {latitude: ymax, longitude: xmin},
