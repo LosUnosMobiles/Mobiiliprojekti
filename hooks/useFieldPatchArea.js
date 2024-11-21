@@ -282,10 +282,26 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
         meanPoint,
         {...meanPoint, longitude: container[container.length - 1].longitude},
     )
+    // Define two colinear tolerance rays on both sides of `ray`.
+    const rayHigh = defineLineSegment({
+        latitude: meanPoint.latitude + 0.000002,
+        longitude: meanPoint.longitude,
+    }, {
+        latitude: meanPoint.latitude + 0.000002,
+        longitude: container[container.length - 1].longitude,
+    })
+    const rayLow = defineLineSegment({
+        latitude: meanPoint.latitude - 0.000002,
+        longitude: meanPoint.longitude,
+    }, {
+        latitude: meanPoint.latitude - 0.000002,
+        longitude: container[container.length - 1].longitude,
+    })
+    const rays = [rayHigh, ray, rayLow]
 
     // Count intersecting area lines.
     let segments = []
-    for (let i = 0; i < container.length - 1; i++) {
+    for (let i = 0; i < container.length; i++) {
         segments.push(
             defineLineSegment(areaPoints[i], areaPoints[i + 1])
         )
@@ -293,7 +309,15 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     segments.push(
         defineLineSegment(areaPoints[areaPoints.length-1], areaPoints[0])
     )
-    return segments.filter((a) => segmentsIntersect(ray, a)).length % 2 === 1
+    return segments.map((a) => ([
+        segmentsIntersect(rays[0], a) ? 1 : 0,
+        segmentsIntersect(rays[1], a) ? 1 : 0,
+        segmentsIntersect(rays[2], a) ? 1 : 0
+    ]))
+        .reduce((acc, [high, mid, low]) => ([acc[0] + high, acc[1] + mid, acc[2] + low]),
+             [0,0,0])
+        .map(x => x % 2 === 1)
+        .reduce((acc, x) => acc + x ? 1 : 0, 0) % 2 === 1
 }
 
 /**
@@ -313,6 +337,10 @@ const generateContainer = (areaPoints) => {
         maxX = (maxX ?? p.longitude) >= p.longitude ? (maxX ?? p.longitude) : p.longitude
         maxY = (maxY ?? p.latitude) >= p.latitude ? (maxY ?? p.latitude) : p.latitude
     })
+    minX -= 0.001
+    minY -= 0.001
+    maxX += 0.001
+    maxY += 0.001
     const topLeft = {latitude: maxY, longitude: minX}
     const bottomLeft = {latitude: minY, longitude: minX}
     const bottomRight = {latitude: minY, longitude: maxX}
