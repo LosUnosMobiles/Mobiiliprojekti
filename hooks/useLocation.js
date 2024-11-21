@@ -13,26 +13,35 @@ export default function useLocation() {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     })
-    const [errorMsg, setErrorMsg] = useState(null);
+    const [errorMsg, setErrorMsg] = useState("awaiting location");
 
     useEffect(() => {
         async function getCurrentLocation() {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Paikannusluvan pyytäminen epäonnistui!');
-                return;
+                return null;
             }
 
-            setLocation(await Location.getCurrentPositionAsync({
+            setErrorMsg(null);
+            const loc = await Location.getCurrentPositionAsync({
                 accuracy: 5, // Most accurate
                 mayShowUserSettingsDialog: false,
                 timeInterval: 800,
                 distanceInterval: null,
-            }))
-            setLocation(location)
+            })
+            return loc
         }
 
-        getCurrentLocation();
+        const intervalHandle = setInterval(() => {
+            getCurrentLocation()
+                .then((loc) => {
+                    setLocation(loc.coords)
+                    console.log(loc)
+                })
+        }, 3500)
+
+        return () => clearInterval(intervalHandle)
     }, []);
 
     return {location, errorMsg};
