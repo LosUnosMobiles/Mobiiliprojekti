@@ -6,5 +6,6 @@ export default  {
     lightText: "#fff",
     innerCircle: "#F8F2E8",
     text: "#333333",
+    error: "#FF0000",
     transparentBackground: "rgba(0,0,0,0.1)"
 }
