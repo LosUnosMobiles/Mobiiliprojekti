@@ -1,24 +1,21 @@
 import BottomBar from "../components/BottomBar";
 import {Text, View} from "react-native";
 import styles from "../styles/styles";
-import MapView, {Marker} from "react-native-maps";
+import MapView, {MapPolygon, Marker, Polyline} from "react-native-maps";
 import useLocation from "../hooks/useLocation";
 import useFieldPatchArea from "../hooks/useFieldPatchArea";
 import React, {useState} from "react";
 import {Button, Icon} from "react-native-paper";
 import style from "../styles/styles";
 import colorScheme from "../styles/colorScheme";
-import {ImageSVG} from "@shopify/react-native-skia";
-import Icons from "react-native-vector-icons"
 
 export default () => {
     const {location, errorMsg} = useLocation();
-    const {pushPoint, popPoint, area, error} = useFieldPatchArea();
+    const {pushPoint, popPoint, area, points, error} = useFieldPatchArea();
     const [selectedPoint, setSelectedPoint] = useState(null);
     const [markers, setMarkers] = useState([]);
     return (
         <View style={styles.container}>
-
             {errorMsg ? <Text>{errorMsg}</Text>
                 : <MapView initialRegion={location}
                            region={
@@ -28,23 +25,26 @@ export default () => {
                            style={styles.map} >
                     <Marker
                         coordinate={location}
-                        title={"Moon täs"}
+                        title="Moon täs"
                     />
-                    {selectedPoint && <Marker
+                    {selectedPoint !== null && <Marker
                         pinColor="green"
                         coordinate={selectedPoint}
                         title="Mun valittema piste"
                         onPress={() => setSelectedPoint(null)}
                     />}
+                    {points.length >= 3 && <MapPolygon
+                        coordinates={points}
+                        strokeColor={colorScheme.accent}
+                    />}
                     {markers.map((marker, i) => (<Marker key={i} coordinate={location}/>))}
                 </MapView>}
-
             <View style={{flex: 1, position: "absolute", bottom: 60, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Button style={style.navigationButton}
-                        onPress={() => pushPoint(selectedPoint)}
+                        onPress={() => selectedPoint && pushPoint(selectedPoint)}
                 >
-                    <Icon size={22} source="map-outline"/>
-                    <Text style={style.buttonText}>Karttapiste</Text>
+                    <Icon size={22} source="map-outline" color={ selectedPoint ? colorScheme.text : "#aaa"} />
+                    <Text style={selectedPoint ? style.buttonText : {...style.buttonText, color: "#aaa"}}>Karttapiste</Text>
                 </Button>
                 <Button style={style.navigationButton}
                         mode="contained"
@@ -56,7 +56,7 @@ export default () => {
 
             <BottomBar>
                 <View style={{...styles.bottomBarWithChildren, textAlign: "center"}}>
-                    {area.ha && <Text style={style.buttonText}>
+                    {area.ha > 0 && <Text style={style.buttonText}>
                         Pinta-ala: {area.ha.toFixed(2)}ha, eli {area.sqm.toFixed(0)}m²
                     </Text>}
                 </View>

@@ -64,30 +64,39 @@ const useFieldPatchArea = () => {
      * @returns {number} Is in *m^2*
      */
     const calculateArea = () => {
-        if (points.length >= 3 && addingSegmentKeepsAreaContiguous(points)) {
-            let copy = [...points]
-            const a = points[0]
-            let accumulatedArea = 0
-            while (copy.length >= 3) {
-                const [b, c] = copy.slice(copy.length-2)
-                if (triangleIsInsideArea([a,b,c], copy)) {
-                    accumulatedArea += calculateAreaOfTriangle(a,b,c)
-                } else { // outside
-                    accumulatedArea -= calculateAreaOfTriangle(a,b,c)
-                }
-                copy.splice(copy.length-1, 1)
+        return _calculateArea([...points])
+    }
+
+    const _calculateArea = (areaPointsCopy) => {
+        const [a, b, c] = areaPointsCopy.slice(0, 3)
+        if (a && b && c) { // areaPointsCopy is long enough to form an area.
+            if (!areaPointsCopy  // Check for intersects
+                .map((_item, i) => (
+                    areaPointsCopy[i+1] !== undefined ?
+                        isIntersect(a, c, areaPointsCopy[i], areaPointsCopy[i+1]) :
+                        isIntersect(a, c, areaPointsCopy[i], areaPointsCopy[0])
+                )).reduce((a, b) => a || b)) {
+                // All conditions for calculating area at this point are met.
+                const areaSum = triangleIsInsideArea([a, b, c], areaPointsCopy) ?
+                    calculateAreaOfTriangle(a, b, c) : -calculateAreaOfTriangle(a, b, c)
+                console.log("Everything smooth, recursing")
+                return _calculateArea(areaPointsCopy.toSpliced(1,1)) + areaSum
+            } else {
+                // All conditions for calculating area at this point are not met.
+                console.log("shifting and recursing!")
+                areaPointsCopy.push(areaPointsCopy.shift())
+                return _calculateArea(areaPointsCopy)
             }
-            return accumulatedArea
-        } else if (!addingSegmentKeepsAreaContiguous(points)) {
-            throw "Area is not contiguous"
+        } else { // areaPointsCopy doesn't have enough points to form an area.
+            return 0
         }
-        return 0 // Could not calculate area from too few points or non-contiguous area.
     }
 
     return {
         pushPoint: pushPoint,
         popPoint: popPoint,
-        area: area,
+        area,
+        points,
         error: null,
     }
 }
