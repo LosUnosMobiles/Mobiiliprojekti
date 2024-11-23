@@ -42,8 +42,12 @@ export default () => {
                     {points.length >= 3 && <MapPolygon
                         coordinates={points}
                         strokeColor={colorScheme.accent}
+                        fillColor={"rgba(255,216,71,0.25)"}
+                        strokeWidth={3}
                     />}
-                    {markers.map((marker, i) => (<Marker key={i} coordinate={location}/>))}
+                    {points.length <= 1 ?
+                        (points[0] && <Marker key={0} coordinate={points[0]} title={"Eka aluepiste"}/>) :
+                        points.length === 2 && <Polyline coordinates={points} strokeWidth={3} strokeColor={colorScheme.accent} /> }
                 </MapView>
             <View style={{flex: 1, position: "absolute", bottom: 60, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Button style={style.navigationButton}
