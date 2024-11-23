@@ -10,7 +10,7 @@ import style from "../styles/styles";
 import colorScheme from "../styles/colorScheme";
 
 export default () => {
-    const {location, errorMsg} = useLocation();
+    const {location, meta, errorMsg} = useLocation();
     const {pushPoint, popPoint, points, area, error} = useFieldPatchArea()
     const [selectedPoint, setSelectedPoint] = useState(null);
     const [markers, setMarkers] = useState([])
@@ -18,7 +18,7 @@ export default () => {
         <View style={styles.container}>
             <MapView initialRegion={location}
                      region={
-                            {latitude: location.latitude, longitude: location.longitude,
+                            {...location,
                              latitudeDelta: 0.003, longitudeDelta: 0.003}}
                      onLongPress={(ev) => setSelectedPoint(ev.nativeEvent.coordinate)}
                      style={styles.map} >
@@ -59,6 +59,7 @@ export default () => {
                     {area.ha > 0 && <Text style={style.buttonText}>
                         Pinta-ala: {area.ha.toFixed(2)}ha, eli {area.sqm.toFixed(0)}m²
                     </Text>}
+                    {meta && <Text>Tarkkuus: {meta.accuracy.toFixed(1)}m</Text>}
                 </View>
             </BottomBar>
 

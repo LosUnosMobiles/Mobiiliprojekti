@@ -17,10 +17,20 @@ const useFieldPatchArea = () => {
     const [error, setError] = useState(null)
 
     useEffect(() => {
+        if(points.filter(a => !(a.longitude && a.latitude)).length > 0) {
+            setError("invalid points")
+            return
+        }
         if (points.length > 3 && !areaIsContiguous(points)) {
             setError("Risteävät rajaviivat")
-        } else {
+        } else if (points.length >= 3 && areaIsContiguous(points)) { // if (!points.filter(a => a.latitude === undefined)) {
             setError(null)
+            const areaInSqm = calculateArea(points)
+            setArea({
+                ha: areaInSqm / 10000,
+                sqm: areaInSqm,
+                numVertices: points.length
+            })
         }
     }, [points]);
 
@@ -56,29 +66,18 @@ const useFieldPatchArea = () => {
     }
 
     /**
-     * Re-calculate area when points change.
-     */
-    useEffect(() => {
-        const areaInSqm = calculateArea()
-        setArea({
-            ha: areaInSqm / 10000,
-            sqm: areaInSqm,
-            numVertices: points.length
-        })
-    }, [points]);
-
-    /**
      * Calculate area delimited by the hook's line segments.
      *
      * @returns {number} Is in *m^2*
      */
-    const calculateArea = () => {
+    const calculateArea = (points) => {
         return _calculateArea([...points])
     }
 
     const _calculateArea = (areaPointsCopy) => {
         const [a, b, c] = areaPointsCopy.slice(0, 3)
         if (a && b && c) { // areaPointsCopy is long enough to form an area.
+            setError(null)
             if (!areaPointsCopy  // Check for intersects
                 .map((_item, i) => (
                     areaPointsCopy[i+1] !== undefined ?
@@ -92,8 +91,8 @@ const useFieldPatchArea = () => {
                 return _calculateArea(areaPointsCopy.toSpliced(1,1)) + areaSum
             } else {
                 // All conditions for calculating area at this point are not met.
-                console.log("shifting and recursing!")
                 areaPointsCopy.push(areaPointsCopy.shift())
+                console.log(areaPointsCopy)
                 return _calculateArea(areaPointsCopy)
             }
         } else { // areaPointsCopy doesn't have enough points to form an area.

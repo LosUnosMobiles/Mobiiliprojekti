@@ -14,6 +14,7 @@ export default function useLocation() {
         longitudeDelta: 0.0421,
     })
     const [errorMsg, setErrorMsg] = useState("awaiting location");
+    const [meta, setMeta] = useState(null);
 
     useEffect(() => {
         async function getCurrentLocation() {
@@ -37,11 +38,12 @@ export default function useLocation() {
             getCurrentLocation()
                 .then((loc) => {
                     setLocation(loc.coords)
+                    setMeta({mocked: loc.mocked, millisFromEpoch: loc.timestamp, accuracy: loc.coords.accuracy})
                 })
         }, 3500)
 
         return () => clearInterval(intervalHandle)
     }, []);
 
-    return {location, errorMsg};
+    return {location, meta, errorMsg};
 }
