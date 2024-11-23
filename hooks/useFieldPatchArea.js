@@ -75,9 +75,9 @@ const useFieldPatchArea = () => {
     }
 
     const _calculateArea = (areaPointsCopy) => {
+        setError(null)
         const [a, b, c] = areaPointsCopy.slice(0, 3)
         if (a && b && c) { // areaPointsCopy is long enough to form an area.
-            setError(null)
             if (!areaPointsCopy  // Check for intersects
                 .map((_item, i) => (
                     areaPointsCopy[i+1] !== undefined ?
@@ -87,12 +87,12 @@ const useFieldPatchArea = () => {
                 // All conditions for calculating area at this point are met.
                 const areaSum = triangleIsInsideArea([a, b, c], areaPointsCopy) ?
                     calculateAreaOfTriangle(a, b, c) : -calculateAreaOfTriangle(a, b, c)
-                console.log("Everything smooth, recursing")
                 return _calculateArea(areaPointsCopy.toSpliced(1,1)) + areaSum
             } else {
                 // All conditions for calculating area at this point are not met.
                 areaPointsCopy.push(areaPointsCopy.shift())
-                console.log(areaPointsCopy)
+                // TODO: I think this might be unreliably detecting contiguous areas.
+                console.log("area WAS contiguous, is it now?", areaIsContiguous(areaPointsCopy))
                 return _calculateArea(areaPointsCopy)
             }
         } else { // areaPointsCopy doesn't have enough points to form an area.
@@ -202,7 +202,8 @@ const defineLineSegment = (p1, p2) => {
     const deltaX = p1.longitude - p2.longitude
     const k = deltaY / deltaX
     const b = bConstant(p1.longitude, p1.latitude, k)
-    const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude), Math.max(p1.longitude, p2.longitude)]
+    // Shorten the x-span to avoid floating point errors.
+    const [xMin, xMax] = [Math.min(p1.longitude, p2.longitude) + 2e-9, Math.max(p1.longitude, p2.longitude) - 2e-9]
     return {
         k, b, xMin, xMax,
         plotFunc: (x) => {
