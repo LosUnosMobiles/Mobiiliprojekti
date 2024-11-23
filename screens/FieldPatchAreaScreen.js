@@ -11,18 +11,17 @@ import colorScheme from "../styles/colorScheme";
 
 export default () => {
     const {location, errorMsg} = useLocation();
-    const {pushPoint, popPoint, area, points, error} = useFieldPatchArea();
+    const {pushPoint, popPoint, points, area, error} = useFieldPatchArea()
     const [selectedPoint, setSelectedPoint] = useState(null);
-    const [markers, setMarkers] = useState([]);
+    const [markers, setMarkers] = useState([])
     return (
         <View style={styles.container}>
-            {errorMsg ? <Text>{errorMsg}</Text>
-                : <MapView initialRegion={location}
-                           region={
+            <MapView initialRegion={location}
+                     region={
                             {latitude: location.latitude, longitude: location.longitude,
                              latitudeDelta: 0.003, longitudeDelta: 0.003}}
-                           onLongPress={(ev) => setSelectedPoint(ev.nativeEvent.coordinate)}
-                           style={styles.map} >
+                     onLongPress={(ev) => setSelectedPoint(ev.nativeEvent.coordinate)}
+                     style={styles.map} >
                     <Marker
                         coordinate={location}
                         title="Moon täs"
@@ -38,9 +37,10 @@ export default () => {
                         strokeColor={colorScheme.accent}
                     />}
                     {markers.map((marker, i) => (<Marker key={i} coordinate={location}/>))}
-                </MapView>}
+                </MapView>
             <View style={{flex: 1, position: "absolute", bottom: 60, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Button style={style.navigationButton}
+                        disabled={selectedPoint === null}
                         onPress={() => selectedPoint && pushPoint(selectedPoint)}
                 >
                     <Icon size={22} source="map-outline" color={ selectedPoint ? colorScheme.text : "#aaa"} />
@@ -54,7 +54,7 @@ export default () => {
                 </Button>
             </View>
 
-            <BottomBar>
+            <BottomBar text={errorMsg ? errorMsg : error} isError={error} >
                 <View style={{...styles.bottomBarWithChildren, textAlign: "center"}}>
                     {area.ha > 0 && <Text style={style.buttonText}>
                         Pinta-ala: {area.ha.toFixed(2)}ha, eli {area.sqm.toFixed(0)}m²

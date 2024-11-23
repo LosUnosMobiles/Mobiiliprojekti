@@ -13,7 +13,16 @@ import {useEffect, useState} from "react";
 const useFieldPatchArea = () => {
 
     const [points, setPoints] = useState([])
-    const [area, setArea] = useState(0)
+    const [area, setArea] = useState({ha: 0, sqm: 0})
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        if (points.length > 3 && !areaIsContiguous(points)) {
+            setError("Risteävät rajaviivat")
+        } else {
+            setError(null)
+        }
+    }, [points]);
 
     /**
      * Push a GPS point to the stack.
@@ -31,7 +40,7 @@ const useFieldPatchArea = () => {
     const popPoint = () => {
         if (points.length > 0) {
             let lastPoint={...points[points.length-1], ordinal: points.length}
-            setPoints([...points.slice(0, points.length - 1)])  
+            setPoints([...points.slice(0, points.length - 1)])
             return lastPoint
         }
         return null
@@ -97,7 +106,7 @@ const useFieldPatchArea = () => {
         popPoint: popPoint,
         area,
         points,
-        error: null,
+        error,
     }
 }
 
@@ -207,21 +216,25 @@ const defineLineSegment = (p1, p2) => {
 }
 
 /**
- * Check that newest line segment doesn't intersect with other area line segments.
+ * Check that area limiting border doesn't intersect with itself.
  *
  * @param area Is an array like `[{latitude: number, longitude: number}, ...]`
  * @returns {boolean}
  */
-const addingSegmentKeepsAreaContiguous = (areaPoints) => {
+const areaIsContiguous = (areaPoints) => {
     let copy = [...areaPoints]
+    let segments = []
 
-    if (copy.length >= 3) {
-        const newestLine = areaPoints.slice(areaPoints.length - 2)
-        const [np1, np2] = newestLine
+    for (let i = 0; i < areaPoints.length - 1; i++) {
+        segments.push(
+            defineLineSegment(areaPoints[i], areaPoints[i+1])
+        )
+    }
+    segments.push(defineLineSegment(areaPoints[areaPoints.length - 1], areaPoints[0]))
 
-        for (let i = 0; i < copy.length - 3; i++) {
-            const cmpLine = isIntersect(np1, np2, copy[i], copy[i + 1])
-            if (cmpLine) {
+    for (let i = 0; i < segments.length - 3; i++) {
+        for (let j = i+2; j < segments.length-1; j++) {
+            if (segmentsIntersect(segments[i], segments[j])) {
                 return false
             }
         }
@@ -324,8 +337,6 @@ const triangleIsInsideArea = (trianglePoints, areaPoints) => {
     // Count intersecting area lines.
     let segments = []
     for (let i = 0; i < areaPoints.length-1; i++) {
-        // console.log(container[i])
-        // console.log(container[i+1])
         segments.push(
             defineLineSegment(areaPoints[i], areaPoints[i + 1])
         )
@@ -379,7 +390,7 @@ export {
     calculateAreaOfTriangle as __internal_calculateAreaOfTriangle,
     distanceBetween as __internal_distanceBetween,
     isIntersect as __internal_isIntersect,
-    addingSegmentKeepsAreaContiguous as __internal_areaIsContiguous,
+    areaIsContiguous as __internal_areaIsContiguous,
     calculateLocalEarthRadius as __internal_calculateLocalEarthRadius,
     generateContainer as __internal_generateContainer,
     triangleIsInsideArea as __internal_triangleIsInsideArea,
