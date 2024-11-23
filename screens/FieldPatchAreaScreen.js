@@ -14,18 +14,25 @@ export default () => {
     const {pushPoint, popPoint, points, area, error} = useFieldPatchArea()
     const [selectedPoint, setSelectedPoint] = useState(null);
     const [markers, setMarkers] = useState([])
+    const [mapPosLockedToUser, setMapPosLockedToUser] = useState(true)
+    const [zoom, setZoom] = useState({latitudeDelta: 0.003, longitudeDelta: 0.003})
     return (
         <View style={styles.container}>
-            <MapView initialRegion={location}
-                     region={
-                            {...location,
-                             latitudeDelta: 0.003, longitudeDelta: 0.003}}
+            <MapView initialRegion={{...location, ...zoom}}
                      onLongPress={(ev) => setSelectedPoint(ev.nativeEvent.coordinate)}
-                     style={styles.map} >
-                    <Marker
-                        coordinate={location}
-                        title="Moon täs"
-                    />
+                     style={styles.map}
+                     onPanDrag={(_ev) => {
+                         setMapPosLockedToUser(false)
+                     }}
+                     onDoublePress={(_ev) => {
+                         setMapPosLockedToUser(true)
+                     }}
+                     zoomTapEnabled={false}
+                     zoomEnabled={true}
+                     mapType="hybrid"
+                     showsUserLocation={true}
+                     userLocationAnnotationTitle="Moon täs"
+            >
                     {selectedPoint !== null && <Marker
                         pinColor="green"
                         coordinate={selectedPoint}
