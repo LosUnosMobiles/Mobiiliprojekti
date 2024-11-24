@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import {Button, Icon, Menu} from 'react-native-paper';
+import {Button, Divider, Icon, Menu} from 'react-native-paper';
 import {useState} from "react";
+import {points, area, error} from "../signals/fieldPatchAreaSignals"
 
 const FieldPatchAreaMenu = () => {
     const [visible, setVisible] = useState(false);
@@ -19,7 +20,12 @@ const FieldPatchAreaMenu = () => {
                 visible={visible}
                 onDismiss={closeMenu}
                 anchor={<Button onPress={openMenu}><Icon size={30} source="menu"/></Button>}>
-                <Menu.Item onPress={() => {}} title="Poista viimeisin piste" />
+                <Menu.Item onPress={() => {
+                    points.value = [...points.value.slice(0, points.value.length - 1)]
+                }} title="Poista viimeisin piste" />
+                <Menu.Item onPress={() => {
+                    points.value = []
+                }} title="Tyhjennä pisteet" />
             </Menu>
         </View>
     );
