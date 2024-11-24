@@ -28,6 +28,8 @@ const useFieldPatchArea = () => {
                 sqm: areaInSqm,
                 numVertices: points.value.length
             }
+        } else { // Less than 3 points cannot form area. Reset it to 0.
+            area.value = {ha: 0, sqm: 0}
         }
     }, [points.value]);
 
