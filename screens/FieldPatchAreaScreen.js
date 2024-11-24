@@ -39,15 +39,15 @@ export default () => {
                         title="Mun valittema piste"
                         onPress={() => setSelectedPoint(null)}
                     />}
-                    {points.length >= 3 && <MapPolygon
-                        coordinates={points}
+                    {points.value.length >= 3 && <MapPolygon
+                        coordinates={points.value}
                         strokeColor={colorScheme.accent}
                         fillColor={"rgba(255,216,71,0.25)"}
                         strokeWidth={3}
                     />}
-                    {points.length <= 1 ?
-                        (points[0] && <Marker key={0} coordinate={points[0]} title={"Eka aluepiste"}/>) :
-                        points.length === 2 && <Polyline coordinates={points} strokeWidth={3} strokeColor={colorScheme.accent} /> }
+                    {points.value.length <= 1 ?
+                        (points.value[0] && <Marker key={0} coordinate={points.value[0]} title={"Eka aluepiste"}/>) :
+                        points.value.length === 2 && <Polyline coordinates={points.value} strokeWidth={3} strokeColor={colorScheme.accent} /> }
                 </MapView>
             <View style={{flex: 1, position: "absolute", bottom: 60, flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Button style={style.navigationButton}
@@ -65,10 +65,10 @@ export default () => {
                 </Button>
             </View>
 
-            <BottomBar text={errorMsg ? errorMsg : error} isError={error} >
+            <BottomBar text={errorMsg ? errorMsg : error.value} isError={error.value} >
                 <View style={{...styles.bottomBarWithChildren, textAlign: "center", paddingLeft: 8, paddingRight: 8}}>
-                    {area.ha > 0 && <Text style={style.buttonText}>
-                        Pinta-ala: {area.ha.toFixed(2)}ha, eli {area.sqm.toFixed(0)}m²
+                    {area.value.ha > 0 && <Text style={style.buttonText}>
+                        Pinta-ala: {area.value.ha.toFixed(2)}ha, eli {area.value.sqm.toFixed(0)}m²
                     </Text>}
                     {meta && <Text>Tarkkuus: {meta.accuracy.toFixed(1)}m</Text>}
                 </View>

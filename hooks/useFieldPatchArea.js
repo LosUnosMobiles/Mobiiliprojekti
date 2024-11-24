@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {area, points, error} from "../signals/fieldPatchAreaSignals"
 
 /**
  * Prior to entering
@@ -12,27 +13,23 @@ import {useEffect, useState} from "react";
  */
 const useFieldPatchArea = () => {
 
-    const [points, setPoints] = useState([])
-    const [area, setArea] = useState({ha: 0, sqm: 0})
-    const [error, setError] = useState(null)
-
     useEffect(() => {
-        if(points.filter(a => !(a.longitude && a.latitude)).length > 0) {
-            setError("invalid points")
+        if(points.value.filter(a => !(a.longitude && a.latitude)).length > 0) {
+            error.value = "invalid points"
             return
         }
-        if (points.length > 3 && !areaIsContiguous(points)) {
-            setError("Risteävät rajaviivat")
-        } else if (points.length >= 3 && areaIsContiguous(points)) { // if (!points.filter(a => a.latitude === undefined)) {
-            setError(null)
-            const areaInSqm = calculateArea(points)
-            setArea({
+        if (points.value.length > 3 && !areaIsContiguous(points.value)) {
+            error.value = "Risteävät rajaviivat"
+        } else if (points.value.length >= 3 && areaIsContiguous(points.value)) { // if (!points.filter(a => a.latitude === undefined)) {
+            error.value = null
+            const areaInSqm = calculateArea(points.value)
+            area.value = {
                 ha: areaInSqm / 10000,
                 sqm: areaInSqm,
-                numVertices: points.length
-            })
+                numVertices: points.value.length
+            }
         }
-    }, [points]);
+    }, [points.value]);
 
     /**
      * Push a GPS point to the stack.
@@ -40,7 +37,7 @@ const useFieldPatchArea = () => {
      * @arg point Is an object like `{longitude: number, latitude: number}`
      */
     const pushPoint = (point) => {
-        setPoints([...points, point])
+        points.value = [...points.value, point]
     }
 
     /**
@@ -48,9 +45,9 @@ const useFieldPatchArea = () => {
      *
      */
     const popPoint = () => {
-        if (points.length > 0) {
-            let lastPoint={...points[points.length-1], ordinal: points.length}
-            setPoints([...points.slice(0, points.length - 1)])
+        if (points.value.length > 0) {
+            let lastPoint={...points.value[points.value.length-1], ordinal: points.value.length}
+            points.value = [...points.value.slice(0, points.value.length - 1)]
             return lastPoint
         }
         return null
@@ -62,7 +59,7 @@ const useFieldPatchArea = () => {
      * @returns {*[]}
      */
     const getPoints = () => {
-        return points
+        return points.value
     }
 
     /**
@@ -75,7 +72,7 @@ const useFieldPatchArea = () => {
     }
 
     const _calculateArea = (areaPointsCopy) => {
-        setError(null)
+        error.value = null
         const [a, b, c] = areaPointsCopy.slice(0, 3)
         if (a && b && c) { // areaPointsCopy is long enough to form an area.
             if (!areaPointsCopy  // Check for intersects
@@ -218,13 +215,11 @@ const defineLineSegment = (p1, p2) => {
 /**
  * Check that area limiting border doesn't intersect with itself.
  *
- * @param area Is an array like `[{latitude: number, longitude: number}, ...]`
+ * @param areaPoints Is an array like `[{latitude: number, longitude: number}, ...]`
  * @returns {boolean}
  */
 const areaIsContiguous = (areaPoints) => {
-    let copy = [...areaPoints]
     let segments = []
-
     for (let i = 0; i < areaPoints.length - 1; i++) {
         segments.push(
             defineLineSegment(areaPoints[i], areaPoints[i+1])
