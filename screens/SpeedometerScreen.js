@@ -32,8 +32,9 @@ const font = matchFont(fontStyle);
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
 
-const textXOffset = 0.2 * windowDimensions.width;
-const textYOffset = 25;
+const textXOffset = 0.13 * windowDimensions.width;
+const textYOffsetSpeed = -0.01 * windowDimensions.width;
+const textYOffsetKmh = 0.18 * windowDimensions.width;
 
 const size = 200;
 
@@ -42,14 +43,16 @@ const slStyles = slStylesFactory(windowDimensions.width);
 const SpeedometerScreen = () => {
     const [planeLocked, setPlaneLocked] = useState(false);
     const slopeAndDirection = useSpiritLevel(planeLocked);
+    const speed = 80
+
 
     const getRadius = (width, height) => {
         return Math.min(width, height) / 2.5;
     }
 
     const path = Skia.Path.Make();
-    path.moveTo(windowDimensions.width / 2 - textYOffset, windowDimensions.width / 2 - textXOffset);
-    path.lineTo(windowDimensions.width / 2 - textYOffset, windowDimensions.width / 2 - textXOffset + 300);
+    path.moveTo(windowDimensions.width / 2 - textYOffsetSpeed, windowDimensions.width / 2 - textXOffset);
+    path.lineTo(windowDimensions.width / 2 - textYOffsetSpeed, windowDimensions.width / 2 - textXOffset + 300);
 
     /**
      * Calculate small indicator circle coordinates from direction given by useSpiritLevel-hook.
@@ -59,7 +62,7 @@ const SpeedometerScreen = () => {
      */
     const getPositionUsingCurrentDirection = (width, height) => {
 
-        const direction = slopeAndDirection.direction; //direction in radians
+        const direction = speed/160*Math.PI - Math.PI ;
         const r = getRadius(width, height);
         const xVal = Math.cos(direction) * r;
         const yVal = Math.sin(direction) * r;
@@ -75,13 +78,13 @@ const SpeedometerScreen = () => {
                     <Circle  // Rim
                         cx={windowDimensions.width / 2}
                         cy={windowDimensions.width / 2}
-                        r={getRadius(windowDimensions.width, windowDimensions.width) + 10}
+                        r={getRadius(windowDimensions.width, windowDimensions.width) + 15}
                         color={colorScheme.accent}
                     />
                     <Circle  // Inner circle
                         cx={windowDimensions.width / 2}
                         cy={windowDimensions.width / 2}
-                        r={getRadius(windowDimensions.width, windowDimensions.width) - 10}
+                        r={getRadius(windowDimensions.width, windowDimensions.width) - 15}
                         color={colorScheme.innerCircle}
                     />
                     <Circle // Indicator circle
@@ -91,15 +94,18 @@ const SpeedometerScreen = () => {
                         color={colorScheme.primary}
                     />
                 </Group>
-                {slopeAndDirection.useCase !== "taulu" ? <SkiaText
-                        x={windowDimensions.width / 2 - textXOffset}
-                        y={windowDimensions.width / 2 + textYOffset}
-                        text={(slopeAndDirection.slope ?? "unreadable") + "°"} font={font}
-                    /> :
-                    <Group transform={[{rotate: -0 * Math.PI}]} origin={vec(size, size)}>
-                        <TextPath font={font} path={path} text={(slopeAndDirection.slope ?? "unreadable") + "°"}
-                                  font={font}/>
-                    </Group>}
+                <SkiaText
+                    x={speed <= 100 ? windowDimensions.width / 2 - textXOffset + 12 : windowDimensions.width / 2 - textXOffset - 20}
+                    y={windowDimensions.width / 2 + textYOffsetSpeed}
+                    color={colorScheme.text} text={"" + speed} font={font}
+                />
+                <SkiaText
+                        x={windowDimensions.width / 2 - textXOffset-10}
+                        y={windowDimensions.width / 2 + textYOffsetKmh}
+                        text="kmh" font={font} color={colorScheme.text}
+                    />
+                     
+
             </Canvas>
             <View style={styles.padding}/>
             <BottomBar
