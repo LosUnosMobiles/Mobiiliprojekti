@@ -25,6 +25,7 @@ export default function App() {
                     {headerStyle: [{backgroundColor: colorScheme.primary}] }}>
                     <Stack.Screen name="Menu" component={MenuScreen} />
                     <Stack.Screen name="Vatupassi" component={SpiritLevelScreen} />
+                    <Stack.Screen name="Kompassi" component={CompassScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

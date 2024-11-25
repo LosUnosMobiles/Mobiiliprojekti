@@ -47,6 +47,7 @@ const renderDegreeMarkers = (size) => {
                         fontStyle: 'normal',
                         fontWeight: 'bold',
                     })}
+                    //>={colorScheme.lightText}
                     color="black"
                 />
             );

@@ -12,7 +12,7 @@ const CustomMapView = ({
             style={styles.map}
             region={region}
             showsUserLocation={true}
-            showsMyLocationButton={true}
+            showsMyLocationPoint={false}
             onPress={onMapPress}
         >
             {destination && (

@@ -17,7 +17,7 @@ export default StyleSheet.create({
         fontSize: 32, // Increase the font size
         color: colorScheme.lightText, // Set the text color
         padding: 16,
-        width: "100%",
+        width: "100%", //
         textAlign: 'center',
     },
     bannerTextError: {
@@ -57,6 +57,5 @@ export default StyleSheet.create({
     buttonText: {
         fontSize: 20, // Adjust font size as needed
         color: colorScheme.text, // Text color
-        //textAlign: 'center',
     },
 });

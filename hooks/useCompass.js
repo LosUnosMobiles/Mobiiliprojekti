@@ -25,7 +25,7 @@ const useCompass = () => {
         error: error 
     });
 
-    // Request permission to use DeviceMotion and Magnetometer.
+    // Request permissions and check if the device has the necessary sensors.
     useEffect(() => {
         const requestPermissions = async () => {
             const deviceMotionAvailable = await DeviceMotion.isAvailableAsync();
