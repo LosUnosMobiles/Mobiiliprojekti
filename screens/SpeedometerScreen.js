@@ -19,6 +19,7 @@ import useSpiritLevel from "../hooks/useSpiritLevel";
 import styles from "../styles/styles";
 import slStylesFactory from "../styles/spiritLevelStyles"
 import BottomBar from "../components/BottomBar";
+import renderSpeedMarkers from '../utils/renderSpeedMarkers';   
 
 const fontFamily = Platform.select({ios: "Helvetica", default: "sans-serif"});
 const fontStyle = {
@@ -27,23 +28,24 @@ const fontStyle = {
     fontStyle: "normal",
     fontWeight: "normal",
 };
-const font = matchFont(fontStyle);
+const fontBig = matchFont(fontStyle);
+const fontSmall = matchFont({...fontStyle, fontSize: 30});
 
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
 
-const textXOffset = 0.13 * windowDimensions.width;
-const textYOffsetSpeed = -0.01 * windowDimensions.width;
-const textYOffsetKmh = 0.18 * windowDimensions.width;
+const textXOffset = 9 * windowDimensions.width/100;
+const textYOffsetSpeed = [1,2,3]//6 * windowDimensions.width/100;
 
-const size = 200;
+const textXOffsetkmh = 10 * windowDimensions.width/100;
+const textYOffsetKmh = 30 * windowDimensions.width/100;
 
 const slStyles = slStylesFactory(windowDimensions.width);
 
 const SpeedometerScreen = () => {
     const [planeLocked, setPlaneLocked] = useState(false);
     const slopeAndDirection = useSpiritLevel(planeLocked);
-    const speed = 80
+    const speed = 0
 
 
     const getRadius = (width, height) => {
@@ -69,6 +71,14 @@ const SpeedometerScreen = () => {
         return {x: width / 2 + xVal, y: height / 2 + yVal};
     }
 
+    const adjustTextPosition = (speed) => {
+        const adjustX = 5*windowDimensions.width/100;
+        const adjustY = 5*windowDimensions.width/100;
+        const textPosition = {x: windowDimensions.width / 2 - speed.toString().length*adjustX, y: windowDimensions.width / 2 + adjustY};
+        return textPosition
+
+    }
+
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
     return (
         <>
@@ -87,6 +97,9 @@ const SpeedometerScreen = () => {
                         r={getRadius(windowDimensions.width, windowDimensions.width) - 15}
                         color={colorScheme.innerCircle}
                     />
+
+                    {renderSpeedMarkers(windowDimensions.width)}
+                    
                     <Circle // Indicator circle
                         cx={x}
                         cy={y}
@@ -95,14 +108,14 @@ const SpeedometerScreen = () => {
                     />
                 </Group>
                 <SkiaText
-                    x={speed <= 100 ? windowDimensions.width / 2 - textXOffset + 12 : windowDimensions.width / 2 - textXOffset - 20}
-                    y={windowDimensions.width / 2 + textYOffsetSpeed}
-                    color={colorScheme.text} text={"" + speed} font={font}
+                    x={adjustTextPosition(speed).x}
+                    y={adjustTextPosition(speed).y}
+                    color={colorScheme.text} text={"" + speed} font={fontBig}
                 />
                 <SkiaText
-                        x={windowDimensions.width / 2 - textXOffset-10}
+                        x={windowDimensions.width / 2 - textXOffsetkmh}
                         y={windowDimensions.width / 2 + textYOffsetKmh}
-                        text="kmh" font={font} color={colorScheme.text}
+                        text="km/h" font={fontSmall} color={colorScheme.text}
                     />
                      
 
