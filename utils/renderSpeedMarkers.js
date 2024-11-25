@@ -10,19 +10,19 @@ const renderSpeedMarkers = (size) => {
     const compassRadius = size / 2.5;
     const tickLength = 10;
 
-    for (let degree = 0; degree <= 360; degree += 10) {
-        const radians = ((degree - 90) * Math.PI) / 180;
-        const isMajorTick = degree % 20 === 0;
+    for (let speed = 0; speed <= 160; speed += 20) {
+        const radians = ((speed - 160) * Math.PI) / 160;
+        const isMajorTick = speed % 20 === 0;
         const currentTickLength = isMajorTick ? tickLength + 5 : tickLength;
 
-        const outerX = size / 2 + (compassRadius + 10) * Math.cos(radians);
-        const outerY = size / 2 + (compassRadius + 10) * Math.sin(radians);
-        const innerX = size / 2 + (compassRadius + 10 - currentTickLength) * Math.cos(radians);
-        const innerY = size / 2 + (compassRadius + 10 - currentTickLength) * Math.sin(radians);
+        const outerX = size / 2 + (compassRadius + 20) * Math.cos(radians);
+        const outerY = size / 2 + (compassRadius + 20) * Math.sin(radians);
+        const innerX = size / 2 + (compassRadius + 0 - currentTickLength) * Math.cos(radians);
+        const innerY = size / 2 + (compassRadius + 0 - currentTickLength) * Math.sin(radians);
 
         markers.push(
             <Line
-                key={`tick-${degree}`}
+                key={`tick-${speed}`}
                 p1={{ x: innerX, y: innerY }}
                 p2={{ x: outerX, y: outerY }}
                 strokeWidth={2}
@@ -30,17 +30,17 @@ const renderSpeedMarkers = (size) => {
             />
         );
 
-        if (isMajorTick && degree !== 360) {
+        if (isMajorTick && speed !== 360) {
             const textRadius = compassRadius + 20;
             const textX = size / 2 + textRadius * Math.cos(radians);
             const textY = size / 2 + textRadius * Math.sin(radians) + 10;
 
             markers.push(
                 <SkiaText
-                    key={`label-${degree}`}
-                    x={textX - 10}
-                    y={textY}
-                    text={`${degree}°`}
+                    key={`label-${speed}`}
+                    x={textX - 20}
+                    y={textY-20} 
+                    text={`${speed}`}
                     font={matchFont({
                         fontFamily,
                         fontSize: 20,

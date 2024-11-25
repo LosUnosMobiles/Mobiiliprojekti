@@ -49,7 +49,7 @@ const SpeedometerScreen = () => {
 
 
     const getRadius = (width, height) => {
-        return Math.min(width, height) / 2.5;
+        return Math.min(width, height) / 2.7;
     }
 
     const path = Skia.Path.Make();
@@ -87,13 +87,13 @@ const SpeedometerScreen = () => {
                 <Group>
                     <Circle  // Rim
                         cx={windowDimensions.width / 2}
-                        cy={windowDimensions.width / 2}
+                        cy={windowDimensions.width / 2 +20}
                         r={getRadius(windowDimensions.width, windowDimensions.width) + 15}
                         color={colorScheme.accent}
                     />
                     <Circle  // Inner circle
                         cx={windowDimensions.width / 2}
-                        cy={windowDimensions.width / 2}
+                        cy={windowDimensions.width / 2+20}
                         r={getRadius(windowDimensions.width, windowDimensions.width) - 15}
                         color={colorScheme.innerCircle}
                     />
