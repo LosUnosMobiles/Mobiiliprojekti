@@ -15,28 +15,34 @@ export default function MenuScreen() {
 
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => navigation.navigate("Vatupassi")}
-      >
+        onPress={() => navigation.navigate("Vatupassi")}>
         <Text style={style.buttonText}>Vatupassi</Text>
       </Button>
+
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}
-      >
+        onPress={() => console.log('Button Pressed')}>
         <Text style={style.buttonText}>Kompassi</Text>
       </Button>
+
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}
-      >
+        onPress={() => console.log('Button Pressed')}>
         <Text style={style.buttonText}>Metrimitta</Text>
+        </Button>
 
-        </Button>
-        <Button style={style.navigationButton}
-                mode="outlined"
-                onPress={() => navigation.navigate("Sarkalaskuri")}>
-            <Text style={style.buttonText}>Sarkalaskuri</Text>
-        </Button>
-        </View>
+      <Button style={style.navigationButton}
+        mode="outlined"
+        onPress={() => navigation.navigate("Sarkalaskuri")}>
+        <Text style={style.buttonText}>Sarkalaskuri</Text>
+      </Button>
+
+      <Button style={style.navigationButton}
+        mode="outlined"
+        onPress={() => navigation.navigate("Nopeusmittari")}>
+        <Text style={style.buttonText}>Nopeusmittari</Text>
+      </Button>
+
+    </View>
         );
         }

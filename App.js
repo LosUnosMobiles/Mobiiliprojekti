@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 import MenuScreen from "./screens/MenuScreen";
 import SpiritLevelScreen from "./screens/SpiritLevelScreen";
+import SpeedometerScreen from "./screens/SpeedometerScreen";
 import {MD3LightTheme, PaperProvider} from "react-native-paper";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -35,6 +36,7 @@ export default function App() {
                                       ),
                                   }}
                     />
+                    <Stack.Screen name="Nopeusmittari" component={SpeedometerScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>
