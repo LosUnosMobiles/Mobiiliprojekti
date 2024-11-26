@@ -37,7 +37,6 @@ const CompassScreen = () => {
     useEffect(() => {
         let locationSubscription;
         (async () => {
-            //let { status } = await Location.requestForegroundPermissionsAsync();
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 console.log('Permission to access location was denied');
@@ -66,10 +65,10 @@ const CompassScreen = () => {
 
     useEffect(() => {
         if (compassData.direction) {
-            const newHeading = parseFloat(compassData.direction);
-            const normalizedHeading = (newHeading + 360) % 360;
-            console.log('CompassScreen - Heading:', normalizedHeading);
-            setHeading(normalizedHeading);
+            //const newHeading = parseFloat(compassData.direction);
+            //const normalizedHeading = (newHeading + 360) % 360;
+            console.log('CompassScreen - Heading:', compassData.direction);
+            setHeading(compassData.direction);
         }
     }, [compassData.direction]);
 
@@ -81,7 +80,6 @@ const CompassScreen = () => {
                 destination.latitude,
                 destination.longitude
             );
-            //const relativeHeading = destinationBearing - heading;
             const relativeHeading = (destinationBearing - heading + 360) % 360;
 
             console.log('Destination Bearing:', destinationBearing);
@@ -90,7 +88,7 @@ const CompassScreen = () => {
             const { x, y } = getCompassPosition(canvasSize, relativeHeading);
             setArrowPosition({ x, y });
         }
-    }, [heading, location, destination]);
+    }, [location, destination]);
 
     const getRadius = (size) => size / 2.5;
 
@@ -114,15 +112,11 @@ const CompassScreen = () => {
     };
 
     const calculateBearing = (startLat, startLng, destLat, destLng) => {
-        const startLatRad = (startLat * Math.PI) / 180;
-        const startLngRad = (startLng * Math.PI) / 180;
-        const destLatRad = (destLat * Math.PI) / 180;
-        const destLngRad = (destLng * Math.PI) / 180;
 
-        const y = Math.sin(destLngRad - startLngRad) * Math.cos(destLatRad);
+        const y = Math.sin(destLng - startLng) * Math.cos(destLat);
         const x =
-            Math.cos(startLatRad) * Math.sin(destLatRad) -
-            Math.sin(startLatRad) * Math.cos(destLatRad) * Math.cos(destLngRad - startLngRad);
+            Math.cos(startLat) * Math.sin(destLat) -
+            Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
 
         const bearing = (Math.atan2(y, x) * 180) / Math.PI;
 
