@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "KehAndroid",
-    "slug": "KehAndroid",
+    "name": "Mobiiliprojekti",
+    "slug": "Mobiiliprojekti",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,6 +12,10 @@
       "backgroundColor": "#ffffff"
     },
     "plugins": [
+      ["expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+        }],
       [
         "expo-sensors",
         {
@@ -21,14 +25,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.KehAndroid"
+      "bundleIdentifier": "com.anonymous.Mobiiliprojekti"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.KehAndroid"
+      "package": "com.anonymous.Mobiiliprojekti"
     },
     "web": {
       "favicon": "./assets/favicon.png"
