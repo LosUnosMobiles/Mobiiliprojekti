@@ -21,8 +21,9 @@ export default function MenuScreen() {
       </Button>
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}
-      >
+        onPress={() => navigation.navigate("Kompassi")}
+
+            >
         <Text style={style.buttonText}>Kompassi</Text>
       </Button>
       <Button style={style.navigationButton}
