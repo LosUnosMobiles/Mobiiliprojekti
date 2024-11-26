@@ -18,12 +18,15 @@ const fontStyle = {
     fontWeight: "normal",
 };
 const font = matchFont(fontStyle);
-
 const windowDimensions = Dimensions.get('window');
 const textXOffset = 0.15 * windowDimensions.width;
 const textYOffset = 20;
 //const canvasSize = windowDimensions.width * 0.9;
-
+/**
+ * CompassScreen component
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const CompassScreen = () => {
     const canvasSize = windowDimensions.width * 0.9;
     const styles = createStyles(canvasSize);
@@ -47,6 +50,7 @@ const CompassScreen = () => {
             locationSubscription = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.BestForNavigation,
+
                     timeInterval: 500,
                     distanceInterval: 0.5,
                 },
@@ -93,7 +97,12 @@ const CompassScreen = () => {
     }, [heading, location, destination]);
 
     const getRadius = (size) => size / 2.5;
-
+    /**
+     * Calculate the position of the compass indicator based on the size of the compass and the relative heading.
+     * @param size
+     * @param relativeHeading
+     * @returns {{x: number, y: number}}
+     */
     const getCompassPosition = (size, relativeHeading) => {
         if (typeof size !== 'number' || typeof relativeHeading !== 'number') {
             console.error('Invalid inputs to getCompassPosition:', { size, relativeHeading });
