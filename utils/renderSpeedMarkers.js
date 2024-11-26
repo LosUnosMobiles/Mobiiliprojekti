@@ -5,9 +5,9 @@ import colorScheme from '../styles/colorScheme'; // Adjust the import path as ne
 
 const fontFamily = Platform.select({ ios: 'Helvetica', default: 'sans-serif' });
 
-const renderSpeedMarkers = (size) => {
+const renderSpeedMarkers = (origo, radius) => {
     const markers = [];
-    const compassRadius = size / 2.5;
+    const compassRadius = radius;
     const tickLength = 10;
 
     for (let speed = 0; speed <= 160; speed += 20) {
@@ -15,10 +15,10 @@ const renderSpeedMarkers = (size) => {
         const isMajorTick = speed % 20 === 0;
         const currentTickLength = isMajorTick ? tickLength + 5 : tickLength;
 
-        const outerX = size / 2 + (compassRadius + 20) * Math.cos(radians);
-        const outerY = size / 2 + (compassRadius + 20) * Math.sin(radians);
-        const innerX = size / 2 + (compassRadius + 0 - currentTickLength) * Math.cos(radians);
-        const innerY = size / 2 + (compassRadius + 0 - currentTickLength) * Math.sin(radians);
+        const outerX = origo.x + (compassRadius + 20) * Math.cos(radians);
+        const outerY = origo.y + (compassRadius + 20) * Math.sin(radians);
+        const innerX = origo.x + (compassRadius + 0 - currentTickLength) * Math.cos(radians);
+        const innerY = origo.y + (compassRadius + 0 - currentTickLength) * Math.sin(radians);
 
         markers.push(
             <Line
@@ -31,15 +31,15 @@ const renderSpeedMarkers = (size) => {
         );
 
         if (isMajorTick && speed !== 360) {
-            const textRadius = compassRadius + 20;
-            const textX = size / 2 + textRadius * Math.cos(radians);
-            const textY = size / 2 + textRadius * Math.sin(radians) + 10;
+            const textRadius = compassRadius + 35;
+            const textX = origo.x + textRadius * Math.cos(radians);
+            const textY = origo.y + textRadius * Math.sin(radians) + 10;
 
             markers.push(
                 <SkiaText
                     key={`label-${speed}`}
-                    x={textX - 20}
-                    y={textY-20} 
+                    x={textX - 9}
+                    y={textY} 
                     text={`${speed}`}
                     font={matchFont({
                         fontFamily,

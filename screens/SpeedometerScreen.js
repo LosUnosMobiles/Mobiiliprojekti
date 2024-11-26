@@ -20,6 +20,7 @@ import styles from "../styles/styles";
 import slStylesFactory from "../styles/spiritLevelStyles"
 import BottomBar from "../components/BottomBar";
 import renderSpeedMarkers from '../utils/renderSpeedMarkers';   
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const fontFamily = Platform.select({ios: "Helvetica", default: "sans-serif"});
 const fontStyle = {
@@ -32,10 +33,9 @@ const fontBig = matchFont(fontStyle);
 const fontSmall = matchFont({...fontStyle, fontSize: 30});
 
 const windowDimensions = Dimensions.get('window');
-const screenDimensions = Dimensions.get('screen');
 
 const textXOffset = 9 * windowDimensions.width/100;
-const textYOffsetSpeed = [1,2,3]//6 * windowDimensions.width/100;
+const textYOffsetSpeed = 1//6 * windowDimensions.width/100;
 
 const textXOffsetkmh = 10 * windowDimensions.width/100;
 const textYOffsetKmh = 30 * windowDimensions.width/100;
@@ -47,10 +47,26 @@ const SpeedometerScreen = () => {
     const slopeAndDirection = useSpiritLevel(planeLocked);
     const speed = 0
 
-
-    const getRadius = (width, height) => {
-        return Math.min(width, height) / 2.7;
+    /**
+     * Setting the centerpoint of circles to the middle of the screen.
+     * @returns 
+     */
+    const getOrigo = () => {   
+        return {x: windowDimensions.width/2 - 3*windowDimensions.width/100 / 2, y: windowDimensions.width/2 + 5*windowDimensions.width/100};
     }
+    const getRadius = () => {
+        return windowDimensions.width / 3;
+    }
+
+    const adjustTextPosition = (speed) => {
+        const adjustX = 19*windowDimensions.width/400;
+        const adjustY = 6*windowDimensions.width/100;
+        const textPosition = {x: getOrigo().x - speed.toString().length*adjustX, y: getOrigo().y + adjustY};
+        return textPosition
+
+    }
+
+
 
     const path = Skia.Path.Make();
     path.moveTo(windowDimensions.width / 2 - textYOffsetSpeed, windowDimensions.width / 2 - textXOffset);
@@ -65,40 +81,35 @@ const SpeedometerScreen = () => {
     const getPositionUsingCurrentDirection = (width, height) => {
 
         const direction = speed/160*Math.PI - Math.PI ;
-        const r = getRadius(width, height);
-        const xVal = Math.cos(direction) * r;
-        const yVal = Math.sin(direction) * r;
-        return {x: width / 2 + xVal, y: height / 2 + yVal};
+        const r = getRadius();
+        const xVal = getOrigo().x + Math.cos(direction) * r;
+        const yVal = getOrigo().y + Math.sin(direction) * r;
+        return {x: xVal, y: yVal};
     }
 
-    const adjustTextPosition = (speed) => {
-        const adjustX = 5*windowDimensions.width/100;
-        const adjustY = 5*windowDimensions.width/100;
-        const textPosition = {x: windowDimensions.width / 2 - speed.toString().length*adjustX, y: windowDimensions.width / 2 + adjustY};
-        return textPosition
 
-    }
 
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
+    
     return (
         <>
             <View style={styles.padding}/>
             <Canvas style={slStyles.canvas}>
                 <Group>
                     <Circle  // Rim
-                        cx={windowDimensions.width / 2}
-                        cy={windowDimensions.width / 2 +20}
+                        cx={getOrigo().x}
+                        cy={getOrigo().y}
                         r={getRadius(windowDimensions.width, windowDimensions.width) + 15}
                         color={colorScheme.accent}
                     />
                     <Circle  // Inner circle
-                        cx={windowDimensions.width / 2}
-                        cy={windowDimensions.width / 2+20}
+                        cx={getOrigo().x}
+                        cy={getOrigo().y}
                         r={getRadius(windowDimensions.width, windowDimensions.width) - 15}
                         color={colorScheme.innerCircle}
                     />
 
-                    {renderSpeedMarkers(windowDimensions.width)}
+                    {renderSpeedMarkers (getOrigo(),getRadius())}
                     
                     <Circle // Indicator circle
                         cx={x}
@@ -110,19 +121,18 @@ const SpeedometerScreen = () => {
                 <SkiaText
                     x={adjustTextPosition(speed).x}
                     y={adjustTextPosition(speed).y}
-                    color={colorScheme.text} text={"" + speed} font={fontBig}
+                    color={colorScheme.text} text={speed.toString()} font={fontBig}
                 />
                 <SkiaText
                         x={windowDimensions.width / 2 - textXOffsetkmh}
                         y={windowDimensions.width / 2 + textYOffsetKmh}
                         text="km/h" font={fontSmall} color={colorScheme.text}
                     />
-                     
 
             </Canvas>
             <View style={styles.padding}/>
             <BottomBar
-                text={slopeAndDirection.error ?? slopeAndDirection.useCase}
+                text={slopeAndDirection.error ?? " "}
                 isError={slopeAndDirection.error} />
         </>
     );
