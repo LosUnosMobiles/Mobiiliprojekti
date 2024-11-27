@@ -1,7 +1,8 @@
 import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
+import styles from "../styles/styles";
 import {
     Skia,
     Canvas,
@@ -9,18 +10,16 @@ import {
     Group,
     Text as SkiaText,
     matchFont,
-    vec,
-    TextPath,
-    Fill,
-    Path
 } from "@shopify/react-native-skia";
-import {useTheme} from "react-native-paper"
+
+import {Button} from "react-native-paper"
 import useSpiritLevel from "../hooks/useSpiritLevel";
-import styles from "../styles/styles";
 import slStylesFactory from "../styles/spiritLevelStyles"
 import BottomBar from "../components/BottomBar";
-import renderSpeedMarkers from '../utils/renderSpeedMarkers';   
+import renderSpeedMarkers from '../utils/renderSpeedMarkers';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {useSpeedometerDemo} from '../utils/speedometerDemo';
+
 
 const fontFamily = Platform.select({ios: "Helvetica", default: "sans-serif"});
 const fontStyle = {
@@ -45,7 +44,11 @@ const slStyles = slStylesFactory(windowDimensions.width);
 const SpeedometerScreen = () => {
     const [planeLocked, setPlaneLocked] = useState(false);
     const slopeAndDirection = useSpiritLevel(planeLocked);
-    const speed = 0
+    const {speed, startDemo} = useSpeedometerDemo();
+
+    const getSpeed = () => {
+        return Math.floor(speed);
+    }
 
     /**
      * Setting the centerpoint of circles to the middle of the screen.
@@ -92,7 +95,7 @@ const SpeedometerScreen = () => {
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
     
     return (
-        <>
+        <View style={{height: "100%", flex:1, flexDirection: "column", alignItems:"center"}}>
             <View style={styles.padding}/>
             <Canvas style={slStyles.canvas}>
                 <Group>
@@ -100,7 +103,7 @@ const SpeedometerScreen = () => {
                         cx={getOrigo().x}
                         cy={getOrigo().y}
                         r={getRadius(windowDimensions.width, windowDimensions.width) + 15}
-                        color={colorScheme.accent}
+                        color={colorScheme.secondary}
                     />
                     <Circle  // Inner circle
                         cx={getOrigo().x}
@@ -119,9 +122,9 @@ const SpeedometerScreen = () => {
                     />
                 </Group>
                 <SkiaText
-                    x={adjustTextPosition(speed).x}
-                    y={adjustTextPosition(speed).y}
-                    color={colorScheme.text} text={speed.toString()} font={fontBig}
+                    x={adjustTextPosition(getSpeed()).x}
+                    y={adjustTextPosition(getSpeed()).y}
+                    color={colorScheme.text} text={getSpeed().toString()} font={fontBig}
                 />
                 <SkiaText
                         x={windowDimensions.width / 2 - textXOffsetkmh}
@@ -130,11 +133,18 @@ const SpeedometerScreen = () => {
                     />
 
             </Canvas>
+
+            <Button style={styles.demoButton}
+                mode="outlined"
+                onPress={startDemo}>
+                <Text style={styles.buttonText}>Demo</Text>
+            </Button>
             <View style={styles.padding}/>
+
             <BottomBar
                 text={slopeAndDirection.error ?? " "}
                 isError={slopeAndDirection.error} />
-        </>
+        </View>
     );
 };
 

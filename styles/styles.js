@@ -67,6 +67,17 @@ export default StyleSheet.create({
         borderColor: colorScheme.accent,
         borderWidth: 3,
     },
+    demoButton: {
+        margin: 40,
+        width: "75%",
+        height: 100,
+        justifyContent: 'center',
+        backgroundColor: colorScheme.secondary,
+        borderRadius: 28,
+        padding: 0,
+        borderColor: colorScheme.innerCircle,
+        borderWidth: 3,
+    },
     buttonText: {
         fontSize: 20, // Adjust font size as needed
         color: colorScheme.text, // Text color
