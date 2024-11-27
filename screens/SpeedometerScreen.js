@@ -19,6 +19,7 @@ import BottomBar from "../components/BottomBar";
 import renderSpeedMarkers from '../utils/renderSpeedMarkers';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useSpeedometerDemo} from '../utils/speedometerDemo';
+import {TouchableOpacity} from 'react-native';
 
 
 const fontFamily = Platform.select({ios: "Helvetica", default: "sans-serif"});
@@ -44,7 +45,12 @@ const slStyles = slStylesFactory(windowDimensions.width);
 const SpeedometerScreen = () => {
     const [planeLocked, setPlaneLocked] = useState(false);
     const slopeAndDirection = useSpiritLevel(planeLocked);
-    const {speed, startDemo} = useSpeedometerDemo();
+    const {speed, changingColor, startDemo} = useSpeedometerDemo();
+    const [buttonColor, setButtonColor] = useState(changingColor);
+
+    useEffect(() => {
+        setButtonColor(changingColor);
+    }, [changingColor]);
 
     const getSpeed = () => {
         return Math.floor(speed);
@@ -95,7 +101,7 @@ const SpeedometerScreen = () => {
     const {x, y} = getPositionUsingCurrentDirection(windowDimensions.width, windowDimensions.width);
     
     return (
-        <View style={{height: "100%", flex:1, flexDirection: "column", alignItems:"center"}}>
+        <View style={{height: "100%", flex:1, flexDirection: "column", alignItems:"center", backgroundColor: colorScheme.background}}>
             <View style={styles.padding}/>
             <Canvas style={slStyles.canvas}>
                 <Group>
@@ -103,7 +109,7 @@ const SpeedometerScreen = () => {
                         cx={getOrigo().x}
                         cy={getOrigo().y}
                         r={getRadius(windowDimensions.width, windowDimensions.width) + 15}
-                        color={colorScheme.secondary}
+                        color={changingColor} // Ensure this is dynamic
                     />
                     <Circle  // Inner circle
                         cx={getOrigo().x}
@@ -134,11 +140,11 @@ const SpeedometerScreen = () => {
 
             </Canvas>
 
-            <Button style={styles.demoButton}
-                mode="outlined"
+            <TouchableOpacity
+                style={[styles.demoButton, {backgroundColor: buttonColor}]}
                 onPress={startDemo}>
                 <Text style={styles.buttonText}>Demo</Text>
-            </Button>
+            </TouchableOpacity>
             <View style={styles.padding}/>
 
             <BottomBar

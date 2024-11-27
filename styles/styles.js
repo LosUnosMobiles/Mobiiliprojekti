@@ -68,11 +68,11 @@ export default StyleSheet.create({
         borderWidth: 3,
     },
     demoButton: {
-        margin: 40,
-        width: "75%",
-        height: 100,
+        margin: 10,
+        width: "30%",
+        height: "10%",
         justifyContent: 'center',
-        backgroundColor: colorScheme.secondary,
+        backgroundColor: colorScheme.primary,
         borderRadius: 28,
         padding: 0,
         borderColor: colorScheme.innerCircle,
@@ -81,7 +81,7 @@ export default StyleSheet.create({
     buttonText: {
         fontSize: 20, // Adjust font size as needed
         color: colorScheme.text, // Text color
-        //textAlign: 'center',
+        textAlign: 'center',
     },
     bottomBarButton: {
         margin: 5,
