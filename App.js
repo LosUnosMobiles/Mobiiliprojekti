@@ -6,6 +6,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import colorScheme from "./styles/colorScheme";
 import CompassScreen from "./screens/CompassScreen";
+import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
+import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
+import 'react-native-gesture-handler';
 
 const theme = {
     ...MD3LightTheme,
@@ -25,6 +28,14 @@ export default function App() {
                     {headerStyle: [{backgroundColor: colorScheme.primary}] }}>
                     <Stack.Screen name="Menu" component={MenuScreen} />
                     <Stack.Screen name="Vatupassi" component={SpiritLevelScreen} />
+                    <Stack.Screen name="Sarkalaskuri"
+                                  component={FieldPatchAreaScreen}
+                                  options={{
+                                      headerRight: () => (
+                                          <FieldPatchAreaMenu />
+                                      ),
+                                  }}
+                    />
                     <Stack.Screen name="Kompassi" component={CompassScreen} />
                 </Stack.Navigator>
             </NavigationContainer>

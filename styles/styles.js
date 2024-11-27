@@ -40,8 +40,21 @@ export default StyleSheet.create({
         margin: 0,
         padding: 0,
     },
+    bottomBarWithChildren: {
+        flex: 1,
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        height: "60",
+        width: "100%",
+        flexDirection: 'row',
+        backgroundColor: colorScheme.primary,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        margin: 0,
+        padding: 0,
+    },
     navigationButton: {
-
         flex: 1,
         margin: 20,
         width: "75%",
@@ -58,4 +71,18 @@ export default StyleSheet.create({
         fontSize: 20, // Adjust font size as needed
         color: colorScheme.text, // Text color
     },
+    bottomBarButton: {
+        margin: 5,
+        width: "45%",
+        height: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    map: {
+        left: 0,
+        bottom: 0,
+        flex: 1,
+        height: "100%",
+        width: '100%',
+    }
 });

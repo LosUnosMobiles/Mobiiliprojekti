@@ -1,4 +1,4 @@
-import { DeviceMotion, Magnetometer } from "expo-sensors";
+import { Magnetometer } from "expo-sensors";
 import { useState, useEffect } from "react";
 
 /*
@@ -14,9 +14,6 @@ const useCompass = () => {
     const [isAvailable, setIsAvailable] = useState(false);
     const [error, setError] = useState("Need sensors to be available");
     const [orientation, setOrientation] = useState({ 
-        alpha: 0,
-        beta: 0,
-        gamma: 0,
         x: 0,
         y: 0,
         z: 0,
@@ -25,53 +22,21 @@ const useCompass = () => {
         error: error 
     });
 
-    // Request permissions and check if the device has the necessary sensors.
+    // Request permission to use DeviceMotion and Magnetometer.
     useEffect(() => {
         const requestPermissions = async () => {
-            const deviceMotionAvailable = await DeviceMotion.isAvailableAsync();
             const magnetometerAvailable = await Magnetometer.isAvailableAsync();
 
-            if (deviceMotionAvailable && magnetometerAvailable) {
+            if (magnetometerAvailable) {
                 setIsAvailable(true);
-                const deviceMotionPermission = await DeviceMotion.requestPermissionsAsync();
                 const magnetometerPermission = await Magnetometer.requestPermissionsAsync();
-                setHasPermission(deviceMotionPermission.status === 'granted' && magnetometerPermission.status === 'granted');
+                setHasPermission(magnetometerPermission.status === 'granted');
             } else {
                 setIsAvailable(false);
             }
         };
         requestPermissions();
     }, []);   
-
-    // Subscribe to DeviceMotion.
-    useEffect(() => {
-        if (!hasPermission || !isAvailable) { // Guard clause and error messages for missing permissions or device not available
-            if (!isAvailable) {
-                setError("Device not available")
-            } else {
-                setError("Missing permissions")
-            }
-            return;
-        }
-        const deviceMotionListener = DeviceMotion.addListener((motionData) => {
-            if (motionData.rotation) { // Added check for motionData.rotation
-                const { alpha, beta, gamma } = motionData.rotation;
-                setOrientation((prevOrientation) => ({ // Update the orientation state
-                    ...prevOrientation,
-                    alpha,
-                    beta,
-                    gamma,
-                    error: null
-                }));
-            }
-
-        });
-
-        DeviceMotion.setUpdateInterval(300); // Set the update interval to 300ms
-        return () => {
-            deviceMotionListener.remove(); // Clean up the listener.
-        };
-    },[hasPermission, isAvailable]);
 
     // Subscribe to Magnetometer.
     useEffect(() => {
@@ -104,33 +69,20 @@ const useCompass = () => {
 
     // Calculate the compass heading
     useEffect(() => {
-        if (orientation.alpha !== undefined && orientation.x !== undefined) {
-            const { alpha, beta, gamma, x, y, z } = orientation;
+        if (orientation.x !== undefined) {
+            const { x, y, z } = orientation;
 
-            // Calculate the tilt compensation
-            const cosAlpha = Math.cos(alpha);
-            const sinAlpha = Math.sin(alpha);
-            const cosBeta = Math.cos(beta);
-            const sinBeta = Math.sin(beta);
-            const cosGamma = Math.cos(gamma);
-            const sinGamma = Math.sin(gamma);
-
-            const Xh = x * cosBeta + y * sinAlpha * sinBeta + z * cosAlpha * sinBeta;
-            const Yh = y * cosAlpha - z * sinAlpha;
-
-            const heading = Math.atan2(Yh, Xh) * (180 / Math.PI);
+            const heading = Math.atan2(y, x) * (180 / Math.PI);
             const correctedHeading = (heading + 360) % 360;
 
             setOrientation((prevOrientation) => ({
                 ...prevOrientation,
-                direction: heading.toFixed(2),
-                offsetNorth: Math.atan2(Math.sin(y), Math.sin(x)).toFixed(2),
-                //offsetNorth: Math.atan2(y, x).toFixed(2),
+                direction: correctedHeading.toFixed(2),
+                offsetNorth: Math.atan2(y, x).toFixed(2),
                 error: null
             }));
-            //console.log(`Heading (corrected): ${heading}, Xh: ${Xh}, Yh: ${Yh}`);  //added for debugging
         }
-    }, [orientation.alpha, orientation.x, orientation.y, orientation.z]);
+    }, [orientation.x, orientation.y, orientation.z]);
 
     return orientation;
 }
