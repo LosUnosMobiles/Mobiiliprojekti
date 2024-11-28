@@ -6,7 +6,7 @@ import * as Location from 'expo-location'
  *
  * @returns {{location: {longitudeDelta: number, latitudeDelta: number, latitude: number, longitude: number}, errorMsg: string}}
  */
-export default function useLocation() {
+export default function useLocation(updateInterval, accuracy) {
     const [location, setLocation] = useState({
         latitude: 65.1,
         longitude: 25.5,
@@ -26,7 +26,7 @@ export default function useLocation() {
 
             setErrorMsg(null);
             const loc = await Location.getCurrentPositionAsync({
-                accuracy: 5, // Most accurate
+                accuracy: accuracy??5, // Defaults to most accurate
                 mayShowUserSettingsDialog: false,
                 timeInterval: 800,
                 distanceInterval: null,
@@ -38,9 +38,9 @@ export default function useLocation() {
             getCurrentLocation()
                 .then((loc) => {
                     setLocation(loc.coords)
-                    setMeta({mocked: loc.mocked, millisFromEpoch: loc.timestamp, accuracy: loc.coords.accuracy})
+                    setMeta({mocked: loc.mocked, millisFromEpoch: loc.timestamp, accuracy: loc.coords.accuracy, speed: loc.coords.speed})
                 })
-        }, 3500)
+        }, updateInterval??3500)
 
         return () => clearInterval(intervalHandle)
     }, []);

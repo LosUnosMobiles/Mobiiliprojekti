@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState, useEffect, useCallback} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
 import styles from "../styles/styles";
@@ -19,6 +19,7 @@ import BottomBar from "../components/BottomBar";
 import renderSpeedMarkers from '../utils/renderSpeedMarkers';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useSpeedometerDemo} from '../utils/speedometerDemo';
+import useLocation from "../hooks/useLocation";
 import {TouchableOpacity} from 'react-native';
 
 
@@ -47,13 +48,21 @@ const SpeedometerScreen = () => {
     const slopeAndDirection = useSpiritLevel(planeLocked);
     const {speed, changingColor, startDemo} = useSpeedometerDemo();
     const [buttonColor, setButtonColor] = useState(changingColor);
+    const {meta} = useLocation(1000, 3)
 
     useEffect(() => {
         setButtonColor(changingColor);
     }, [changingColor]);
 
+    const theSpeed = useCallback(() => {
+        const sMocked = speed??0
+        const sReal = meta?.speed??0
+        console.log(sReal)
+        return sMocked ? sMocked : sReal
+    }, [speed, meta?.speed]);
+
     const getSpeed = () => {
-        return Math.floor(speed);
+        return Math.floor(theSpeed());
     }
 
     /**
