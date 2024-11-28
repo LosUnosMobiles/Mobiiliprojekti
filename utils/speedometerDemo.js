@@ -2,12 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 
 const useSpeedometerDemo = () => {
     const [speed, setSpeed] = useState(0);
-    const [changingColor, setChangingColor] = useState('rgb(255, 190, 100)');
+    const [changingColor, setChangingColor] = useState('rgb(0, 190, 50)');
     
     // Define color codes
-    let codeRed = [250, 100, 250];
-    let codeGreen = [250, 255, 0];
-    let codeBlue = [100, 50, 0]; // 255, 255, 0 is yellow, 255, 0, 0 is red, 0, 255, 0 is green, 0, 0, 255 is blue
+    let codeRed = [0, 250, 255];
+    let codeGreen = [200, 250, 0];
+    let codeBlue = [50, 50, 0]; // 255, 255, 0 is yellow, 255, 0, 0 is red, 0, 255, 0 is green, 0, 0, 255 is blue
 
     // Function to return the sum of the color codes
     const getSumColor = (y, r, b) => {
@@ -36,15 +36,15 @@ const useSpeedometerDemo = () => {
 
     // Function to adjust speed
     const adjustSpeed = () => {
-        const force = 161;
+        const force = 165;
         const airResistance = 1;
 
         setSpeed(prevSpeed => {
-            const newSpeed = prevSpeed + (force - airResistance * prevSpeed) / 500;
+            const newSpeed = prevSpeed + (force - airResistance * prevSpeed) / 100;
             calculateColor(newSpeed); 
             if (newSpeed >= 160) {
                 clearTimeout(timeoutRef.current);
-                setChangingColor('rgb(255, 190, 100)');
+                setChangingColor('rgb(0, 200, 50)');
                 return 0;
             }
             return newSpeed;
