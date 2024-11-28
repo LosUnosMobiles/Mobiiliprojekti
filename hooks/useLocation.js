@@ -28,8 +28,8 @@ export default function useLocation(updateInterval, accuracy) {
             const loc = await Location.getCurrentPositionAsync({
                 accuracy: accuracy??5, // Defaults to most accurate
                 mayShowUserSettingsDialog: false,
-                timeInterval: 800,
                 distanceInterval: null,
+                timeInterval: updateInterval??3000,
             })
             return loc
         }

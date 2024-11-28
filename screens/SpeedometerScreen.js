@@ -48,7 +48,7 @@ const SpeedometerScreen = () => {
     const slopeAndDirection = useSpiritLevel(planeLocked);
     const {speed, changingColor, startDemo} = useSpeedometerDemo();
     const [buttonColor, setButtonColor] = useState(changingColor);
-    const {meta} = useLocation(1000, 3)
+    const {meta} = useLocation(400, 3, 1000)
 
     useEffect(() => {
         setButtonColor(changingColor);
@@ -57,7 +57,6 @@ const SpeedometerScreen = () => {
     const theSpeed = useCallback(() => {
         const sMocked = speed??0
         const sReal = meta?.speed??0
-        console.log(sReal)
         return sMocked ? sMocked : sReal
     }, [speed, meta?.speed]);
 
