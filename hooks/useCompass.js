@@ -13,13 +13,13 @@ const useCompass = () => {
     const [hasPermission, setHasPermission] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
     const [error, setError] = useState("Need sensors to be available");
-    const [orientation, setOrientation] = useState({ 
+    const [orientation, setOrientation] = useState({
         x: 0,
         y: 0,
         z: 0,
-        direction: 0, 
-        offsetNorth: 0, 
-        error: error 
+        direction: 0,
+        offsetNorth: 0,
+        error: error
     });
 
     // Request permission to use DeviceMotion and Magnetometer.
@@ -36,7 +36,7 @@ const useCompass = () => {
             }
         };
         requestPermissions();
-    }, []);   
+    }, []);
 
     // Subscribe to Magnetometer.
     useEffect(() => {
@@ -75,6 +75,9 @@ const useCompass = () => {
             const heading = Math.atan2(y, x) * (180 / Math.PI);
             const correctedHeading = (heading + 360) % 360;
 
+            console.log("Raw Magnetometer Data:", { x, y, z });
+            console.log("Compass Heading (degrees):", correctedHeading.toFixed(2));
+
             setOrientation((prevOrientation) => ({
                 ...prevOrientation,
                 direction: correctedHeading.toFixed(2),
@@ -84,6 +87,7 @@ const useCompass = () => {
         }
     }, [orientation.x, orientation.y, orientation.z]);
 
+    console.log("Current Orientation State:", orientation);
     return orientation;
 }
 

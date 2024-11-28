@@ -3,11 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
 import { Canvas, Circle, Group, Text as SkiaText, matchFont, Line } from "@shopify/react-native-skia";
-import * as Location from 'expo-location';
 import useCompass from "../hooks/useCompass";
 import renderDegreeMarkers from "../utils/renderDegreeMarkers";
 import CustomMapView from "../components/CustomMapView";
 import BottomBar from "../components/BottomBar";
+import calculateBearing from "../utils/calculateBearing";
+import useLocationForCompass from "../hooks/useLocationForCompass";
+import getCompassPosition from "../utils/getCompassPosition";
+import getRadius from "../utils/getRadiusForCompass";
+import useHeadingForCompass from "../hooks/useHeadingForCompass";
+import useArrowPosition from "../hooks/useArrowPositionForCompass";
 
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
@@ -24,6 +29,14 @@ const textYOffset = 20;
 //const canvasSize = windowDimensions.width * 0.9;
 /**
  * CompassScreen component
+ * @description
+ * This component displays a compass that shows the current heading of the device.
+ * The compass also shows the direction to a destination if one is set.
+ * The user can set a destination by tapping on the map.
+ * The compass will then show the direction to the destination.
+ * The compass also shows the current location on the map.
+ * The user's location is updated in real-time.
+ * The compass is implemented using the react-native-skia library.
  * @returns {JSX.Element}
  * @constructor
  */
@@ -32,107 +45,17 @@ const CompassScreen = () => {
     const styles = createStyles(canvasSize);
 
     const compassData = useCompass();
-    const [heading, setHeading] = useState(0);
-    const [location, setLocation] = useState(null);
+    const heading = useHeadingForCompass(compassData);
+    const location = useLocationForCompass()
+
     const [destination, setDestination] = useState(null);
-    const [arrowPosition, setArrowPosition] = useState({ x: canvasSize / 2, y: canvasSize / 2 });
+    const arrowPosition = useArrowPosition(location, destination, heading, canvasSize);
 
-    useEffect(() => {
-        let locationSubscription;
-        (async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                return;
-            }
+    // const destinationBearing = location && destination
+    //     ? calculateBearing(location.latitude, location.longitude, destination.latitude, destination.longitude)
+    //     : 0;
 
-            locationSubscription = await Location.watchPositionAsync(
-                {
-                    accuracy: Location.Accuracy.BestForNavigation,
-
-                    timeInterval: 500,
-                    distanceInterval: 0.5,
-                },
-                (newLocation) => {
-                    console.log('New Location:', newLocation.coords);
-                    setLocation(newLocation.coords);
-                }
-            );
-        })();
-
-        return () => {
-            if (locationSubscription) {
-                locationSubscription.remove();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (compassData.direction) {
-            //const newHeading = parseFloat(compassData.direction);
-            //const normalizedHeading = (newHeading + 360) % 360;
-            console.log('CompassScreen - Heading:', compassData.direction);
-            setHeading(compassData.direction);
-        }
-    }, [compassData.direction]);
-
-    useEffect(() => {
-        if (location && destination) {
-            const destinationBearing = calculateBearing(
-                location.latitude,
-                location.longitude,
-                destination.latitude,
-                destination.longitude
-            );
-            const relativeHeading = (destinationBearing - heading + 360) % 360;
-
-            console.log('Destination Bearing:', destinationBearing);
-            console.log('Current Heading:', heading);
-            console.log('Relative Heading:', relativeHeading);
-            const { x, y } = getCompassPosition(canvasSize, relativeHeading);
-            setArrowPosition({ x, y });
-        }
-    }, [location, destination]);
-
-    const getRadius = (size) => size / 2.5;
-    /**
-     * Calculate the position of the compass indicator based on the size of the compass and the relative heading.
-     * @param size
-     * @param relativeHeading
-     * @returns {{x: number, y: number}}
-     */
-    const getCompassPosition = (size, relativeHeading) => {
-        if (typeof size !== 'number' || typeof relativeHeading !== 'number') {
-            console.error('Invalid inputs to getCompassPosition:', { size, relativeHeading });
-            return { x: size / 2, y: size / 2 }; // Default to center
-        }
-
-        const compassRadius = getRadius(size);
-        const indicatorRadius = size / 20;
-        const effectiveRadius = compassRadius + 10 - indicatorRadius;
-
-        const adjustedHeading = (relativeHeading - 90 + 360) % 360;
-        const radians = (adjustedHeading * Math.PI) / 180;
-
-        const xVal = Math.cos(radians) * effectiveRadius;
-        const yVal = Math.sin(radians) * effectiveRadius;
-
-        return { x: size / 2 + xVal, y: size / 2 + yVal };
-    };
-
-    const calculateBearing = (startLat, startLng, destLat, destLng) => {
-
-        const y = Math.sin(destLng - startLng) * Math.cos(destLat);
-        const x =
-            Math.cos(startLat) * Math.sin(destLat) -
-            Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
-
-        const bearing = (Math.atan2(y, x) * 180) / Math.PI;
-
-        return (bearing + 360) % 360;
-    };
-
-    const { x, y } = getCompassPosition(canvasSize, heading);
+    const { x, y } = getCompassPosition(canvasSize, Number(heading));
 
 
     const region = location
@@ -148,12 +71,6 @@ const CompassScreen = () => {
             latitudeDelta: 0.005,
             longitudeDelta: 0.005,
         };
-
-    const destinationBearing = location && destination
-        ? calculateBearing(location.latitude, location.longitude, destination.latitude, destination.longitude)
-        : 0;
-
-    const { x: arrowX, y: arrowY } = getCompassPosition(canvasSize, destinationBearing);
 
     return (
         <SafeAreaView style={styles.safeArea}>
