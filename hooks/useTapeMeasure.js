@@ -41,20 +41,25 @@ const requestPermission = async () => {
 const useTapeMeasure = () => {
     const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
     const [initialPosition, setInitialPosition] = useState(null);
+    const {distance, setDistance} = useState(0);
+    const permission = requestPermission();
 
     useEffect(() => {
+
         const subscription = DeviceMotion.addListener((event) => {
             const { accelerationIncludingGravity } = event;
             const { x, y, z } = accelerationIncludingGravity;
 
-            if (!initialPosition) {
-                setInitialPosition({ x, y, z });
-            } else {
+            if (initialPosition) {
                 setPosition({
                     x: x - initialPosition.x,
                     y: y - initialPosition.y,
                     z: z - initialPosition.z,
                 });
+                dist = Math.sqrt(position.x ** 2 + position.y ** 2 + position.z ** 2);
+                setDistance(dist);
+            } else {
+                setInitialPosition({ x, y, z });
             }
         });
 
@@ -63,7 +68,7 @@ const useTapeMeasure = () => {
         };
     }, [initialPosition]);
 
-    return position;
+    return position, distance, setInitialPosition();
 };
 
 export default useTapeMeasure;

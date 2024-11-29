@@ -37,6 +37,12 @@ export default function MenuScreen() {
                 onPress={() => navigation.navigate("Sarkalaskuri")}>
             <Text style={style.buttonText}>Sarkalaskuri</Text>
         </Button>
+
+        <Button style={style.navigationButton}
+                mode="outlined"
+                onPress={() => navigation.navigate("Metrimitta")}>
+            <Text style={style.buttonText}>Tape Measure</Text>
+        </Button>
         </View>
         );
         }

@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import colorScheme from './styles/colorScheme';
 import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
+import TapeMeasureScreen from "./screens/TapeMeasureScreen";
 import 'react-native-gesture-handler';
 
 const theme = {
@@ -35,6 +36,7 @@ export default function App() {
                                       ),
                                   }}
                     />
+                    <Stack.Screen name="Metrimitta" component={TapeMeasureScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>
