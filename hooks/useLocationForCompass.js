@@ -40,7 +40,6 @@ const useLocationForCompass = () => {
                     distanceInterval: 0.5,
                 },
                 (newLocation) => {
-                    console.log('New Location:', newLocation.coords);
                     setLocation(newLocation.coords);
                 }
             );

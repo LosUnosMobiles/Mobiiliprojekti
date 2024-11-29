@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef, useCallback, useReducer} from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
-import { Canvas, Circle, Group, Text as SkiaText, matchFont, Line } from "@shopify/react-native-skia";
+import {Canvas, Circle, Group, Text as SkiaText, matchFont, Line, rotate} from "@shopify/react-native-skia";
 import useCompass from "../hooks/useCompass";
 import renderDegreeMarkers from "../utils/renderDegreeMarkers";
 import CustomMapView from "../components/CustomMapView";
@@ -48,6 +48,11 @@ const CompassScreen = () => {
     const heading = useHeadingForCompass(compassData);
     const location = useLocationForCompass()
 
+    const [rimRotation, setRimRotation] = useState({rotation: 0})
+
+    useEffect(() => {
+        setRimRotation(() => ({rotation: heading * Math.PI / 180}))}, [heading]);
+
     const [destination, setDestination] = useState(null);
     const arrowPosition = useArrowPosition(location, destination, heading, canvasSize);
 
@@ -56,7 +61,6 @@ const CompassScreen = () => {
     //     : 0;
 
     const { x, y } = getCompassPosition(canvasSize, Number(heading));
-
 
     const region = location
         ? {
@@ -81,7 +85,6 @@ const CompassScreen = () => {
                     destination={destination}
                     onMapPress={(e) => {
                         const { latitude, longitude } = e.nativeEvent.coordinate;
-                        console.log('Destination set to:', { latitude, longitude });
                         setDestination({ latitude, longitude });
                     }}
                 />
@@ -97,15 +100,18 @@ const CompassScreen = () => {
                             style = "stroke"
                             strokeWidth={30}
                         />
-                        {/* Indicator marker pointing to North*/}
-                        <Circle
-                            cx={x}
-                            cy={y}
-                            r={canvasSize / 20}
-                            color={colorScheme.primary}
-                        />
-                        {/* Degrees and lines */}
-                        {renderDegreeMarkers(canvasSize)}
+                        <Group transform={[{rotate: Number(rimRotation.rotation)}]}
+                               origin={{x: canvasSize/2, y: canvasSize/2}}>
+                            {/* Indicator marker pointing to North*/}
+                            <Circle
+                                cx={x}
+                                cy={y}
+                                r={canvasSize / 20}
+                                color={colorScheme.primary}
+                            />
+                            {/* Degrees and lines */}
+                            {renderDegreeMarkers(canvasSize)}
+                        </Group>
                         {destination && (
                             <Line
                                 p1={{ x: canvasSize / 2, y: canvasSize / 2 }}
