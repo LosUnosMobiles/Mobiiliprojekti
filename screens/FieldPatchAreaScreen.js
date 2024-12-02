@@ -68,9 +68,8 @@ export default () => {
             <BottomBar text={errorMsg ? errorMsg : error.value} isError={error.value} >
                 <View style={{...styles.bottomBarWithChildren, textAlign: "center", paddingLeft: 8, paddingRight: 8}}>
                     {area.value.ha > 0 && <Text style={style.buttonText}>
-                        Pinta-ala: {area.value.ha.toFixed(2)}ha, eli {area.value.sqm.toFixed(0)}m²
+                        Pinta-ala: {area.value.ha.toFixed(2)}ha
                     </Text>}
-                    {meta && <Text>Tarkkuus: {meta.accuracy.toFixed(1)}m</Text>}
                 </View>
             </BottomBar>
 
