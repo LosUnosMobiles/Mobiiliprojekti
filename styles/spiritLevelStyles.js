@@ -14,4 +14,11 @@ export default (canvasWidth) => StyleSheet.create({
         width: canvasWidth,
         height: canvasWidth,
     },
+    speedometerCanvas: {
+        marginTop: "auto",
+        marginBottom: "auto",
+        backgroundColor: colorScheme.background,
+        width: canvasWidth,
+        height: 1.2*canvasWidth,
+    }
 })

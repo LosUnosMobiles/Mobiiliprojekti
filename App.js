@@ -1,10 +1,12 @@
 import {StyleSheet} from 'react-native';
 import MenuScreen from "./screens/MenuScreen";
 import SpiritLevelScreen from "./screens/SpiritLevelScreen";
+import SpeedometerScreen from "./screens/SpeedometerScreen";
 import {MD3LightTheme, PaperProvider} from "react-native-paper";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import colorScheme from './styles/colorScheme';
+import colorScheme from "./styles/colorScheme";
+import CompassScreen from "./screens/CompassScreen";
 import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
 import TapeMeasureScreen from "./screens/TapeMeasureScreen";
@@ -36,6 +38,8 @@ export default function App() {
                                       ),
                                   }}
                     />
+                    <Stack.Screen name="Nopeusmittari" component={SpeedometerScreen} />
+                    <Stack.Screen name="Kompassi" component={CompassScreen} />
                     <Stack.Screen name="Metrimitta" component={TapeMeasureScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
