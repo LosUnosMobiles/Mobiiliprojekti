@@ -17,16 +17,16 @@ import useTapeMeasure from '../hooks/useTapeMeasure'; // Assuming you have a cus
 // }
 
 const TapeMeasureScreen = () => {
-    const { start, stop, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
+    const { start, stop, reset, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Start Time: {initialPosition.timestamp} </Text>
+            <Text style={styles.text}>Start Time: {initialPosition.timestamp.toFixed(3)} </Text>
             <Text style={styles.text}>Length: {distance} </Text>
             <Button 
                 style={styles.button}
-                title={initialPosition.timestamp == 0 ? "Stop" : distance != 0 ? "Reset" : "Start"}
-                onPress={initialPosition.timestamp == 0 ? stop() : distance != 0 ? reset() : start()}
+                title={initialPosition.timestamp == 0 ? "Start" : distance != 0 ? "Stop" : "Reset"}
+                onPress={initialPosition.timestamp == 0 ? start() : distance != 0 ? stop() : reset()}
             />
         </View>
     );
