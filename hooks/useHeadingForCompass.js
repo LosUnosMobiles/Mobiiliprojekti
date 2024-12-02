@@ -9,7 +9,7 @@ const useHeadingForCompass = (compassData) => {
             //const newHeading = parseFloat(compassData.direction);
             //const normalizedHeading = (newHeading + 360) % 360;
             //console.log('CompassScreen - Heading:', compassData.direction);
-            setHeading(compassData.direction);
+            setHeading(parseFloat(compassData.direction));
         }
     }, [compassData.direction]);
     return heading;
