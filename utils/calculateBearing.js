@@ -1,4 +1,11 @@
-
+/**
+ * Calculate the bearing between two coordinates.
+ * @param startLat
+ * @param startLng
+ * @param destLat
+ * @param destLng
+ * @returns {number}
+ */
 
 const calculateBearing = (startLat, startLng, destLat, destLng) => {
     const lat1 = parseFloat(startLat);

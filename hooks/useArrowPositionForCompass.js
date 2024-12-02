@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import calculateBearing from '../utils/calculateBearing';
 import getCompassPosition from '../utils/getCompassPosition';
 
+/**
+ * useArrowPosition hook
+ * @param location
+ * @param destination
+ * @param heading
+ * @param canvasSize
+ * @returns {{x: number, y: number}}
+ */
+
 const useArrowPosition = (location, destination, heading, canvasSize) => {
     const [arrowPosition, setArrowPosition] = useState({
         x: canvasSize / 2,
