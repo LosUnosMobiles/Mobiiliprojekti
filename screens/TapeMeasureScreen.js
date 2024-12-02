@@ -1,20 +1,32 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { useTapeMeasure } from '../hooks/useTapeMeasure'; // Assuming you have a custom hook for tape measure
+import useTapeMeasure from '../hooks/useTapeMeasure'; // Assuming you have a custom hook for tape measure
+
+// useTapeMeasure returns the following:
+// { 
+// start: Function, 
+// stop: Function, 
+// reset: Function, 
+// calculateDistance: Function, 
+// distance: number, 
+// acceleration: Object, 
+// initialPosition: Object, 
+// position: Object, 
+// error: string, 
+// permission: string 
+// }
 
 const TapeMeasureScreen = () => {
-    const { place, distance } = useTapeMeasure();
-
-    const haveStartPoint = distance > 0;
+    const { start, stop, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Place: {place}</Text>
+            <Text style={styles.text}>Start Time: {initialPosition.timestamp} </Text>
             <Text style={styles.text}>Length: {distance} </Text>
             <Button 
                 style={styles.button}
-                title={haveStartPoint ? "Reset" : "Start"}
-                onPress={haveStartPoint ? () => setInitialPosition(place) : () => setInitialPosition(null)}
+                title={initialPosition.timestamp == 0 ? "Stop" : distance != 0 ? "Reset" : "Start"}
+                onPress={initialPosition.timestamp == 0 ? stop() : distance != 0 ? reset() : start()}
             />
         </View>
     );
@@ -30,9 +42,10 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginBottom: 20,
     },
     button: {
-        marginTop: 16,
+        marginTop: 30,
     },
 });
 

@@ -41,7 +41,7 @@ export default function MenuScreen() {
         <Button style={style.navigationButton}
                 mode="outlined"
                 onPress={() => navigation.navigate("Metrimitta")}>
-            <Text style={style.buttonText}>Tape Measure</Text>
+            <Text style={style.buttonText}>Metrimitta</Text>
         </Button>
         </View>
         );
