@@ -22,7 +22,7 @@ const useCompass = () => {
         error: error
     });
 
-    // Request permission to use DeviceMotion and Magnetometer.
+    // Request permission to use Magnetometer.
     useEffect(() => {
         const requestPermissions = async () => {
             const magnetometerAvailable = await Magnetometer.isAvailableAsync();
@@ -75,9 +75,6 @@ const useCompass = () => {
             const heading = Math.atan2(y, x) * (180 / Math.PI);
             const correctedHeading = (heading + 360) % 360;
 
-            console.log("Raw Magnetometer Data:", { x, y, z });
-            console.log("Compass Heading (degrees):", correctedHeading.toFixed(2));
-
             setOrientation((prevOrientation) => ({
                 ...prevOrientation,
                 direction: correctedHeading.toFixed(2),
@@ -87,7 +84,6 @@ const useCompass = () => {
         }
     }, [orientation.x, orientation.y, orientation.z]);
 
-    console.log("Current Orientation State:", orientation);
     return orientation;
 }
 
