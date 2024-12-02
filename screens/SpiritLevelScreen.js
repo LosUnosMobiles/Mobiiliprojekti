@@ -1,6 +1,5 @@
-import {View, Text, StyleSheet, Dimensions, Platform} from 'react-native';
+import {View, Dimensions, Platform} from 'react-native';
 import React, {useMemo, useState} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import colorScheme from "../styles/colorScheme";
 import {
     Skia,
@@ -11,10 +10,7 @@ import {
     matchFont,
     vec,
     TextPath,
-    Fill,
-    Path
 } from "@shopify/react-native-skia";
-import {useTheme} from "react-native-paper"
 import useSpiritLevel from "../hooks/useSpiritLevel";
 import styles from "../styles/styles";
 import slStylesFactory from "../styles/spiritLevelStyles"
@@ -30,7 +26,6 @@ const fontStyle = {
 const font = matchFont(fontStyle);
 
 const windowDimensions = Dimensions.get('window');
-const screenDimensions = Dimensions.get('screen');
 
 const textXOffset = 0.2 * windowDimensions.width;
 const textYOffset = 25;
