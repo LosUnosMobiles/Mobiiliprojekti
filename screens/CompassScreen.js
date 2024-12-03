@@ -55,32 +55,38 @@ const CompassScreen = () => {
     const [destination, setDestination] = useState(null);
     const arrowPosition = useArrowPosition(location, destination, heading, canvasSize);
 
-    // const destinationBearing = location && destination
-    //     ? calculateBearing(location.latitude, location.longitude, destination.latitude, destination.longitude)
-    //     : 0;
+    const [cameraLocked, setCameraLocked] = useState(true);
+    const [camera, setCamera] = useState({
+        center: { latitude:65.01333178773747, longitude: 25.464694270596162 },
+        pitch: 90,
+            zoom: 15,
+        heading: 0
+    });
+
+    useEffect(() => {
+        if (cameraLocked) {
+            setCamera({
+                center: {
+                    latitude: location?.latitude??65.01333178773747,
+                    longitude: location?.longitude??25.464694270596162,
+                },
+                pitch: 90,
+                zoom: 15,
+                heading,
+            })
+        } else {
+            setCamera(null);
+        }
+    }, [cameraLocked, heading, location]);
 
     const { x, y } = getCompassPosition(canvasSize, Number(heading));
 
-    const region = location
-        ? {
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-        }
-        : {
-            latitude: 65.0121,
-            longitude: 25.4641,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-        };
-
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <>
             {/* Map and Compass Container */}
             <View style={styles.canvasContainer}>
                 <CustomMapView
-                    region={region}
+                    camera={camera}
                     destination={destination}
                     onMapPress={(e) => {
                         const { latitude, longitude } = e.nativeEvent.coordinate;
@@ -102,12 +108,12 @@ const CompassScreen = () => {
                         <Group transform={[{rotate: Number(rimRotation.rotation)}]}
                                origin={{x: canvasSize/2, y: canvasSize/2}}>
                             {/* Indicator marker pointing to North*/}
-                            <Circle
-                                cx={x}
-                                cy={y}
-                                r={canvasSize / 20}
-                                color={colorScheme.primary}
-                            />
+                            {/*<Circle*/}
+                            {/*    cx={x}*/}
+                            {/*    cy={y}*/}
+                            {/*    r={canvasSize / 20}*/}
+                            {/*    color={colorScheme.primary}*/}
+                            {/*/>*/}
                             {/* Degrees and lines */}
                             {renderDegreeMarkers(canvasSize)}
                         </Group>
@@ -135,10 +141,8 @@ const CompassScreen = () => {
             {/*<View style={styles.footerBanner}>*/}
 
             {/*</View>*/}
-            <BottomBar
-
-            />
-        </SafeAreaView>
+            <BottomBar/>
+    </>
     );
 };
 

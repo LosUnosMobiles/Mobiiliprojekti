@@ -12,7 +12,10 @@ const useHeadingForCompass = (compassData) => {
 
     useEffect(() => {
         if (compassData.direction) {
-            setHeading(compassData.direction);
+            //const newHeading = parseFloat(compassData.direction);
+            //const normalizedHeading = (newHeading + 360) % 360;
+            //console.log('CompassScreen - Heading:', compassData.direction);
+            setHeading(parseFloat(compassData.direction));
         }
     }, [compassData.direction]);
     return heading;
