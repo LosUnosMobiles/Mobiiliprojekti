@@ -16,15 +16,23 @@ import useTapeMeasure from '../hooks/useTapeMeasure'; // Assuming you have a cus
 // permission: string 
 // }
 
+/*
+
+    <Text style={styles.text}>az: {acceleration.x} </Text>
+    <Text style={styles.text}>az: {acceleration.y} </Text>
+    <Text style={styles.text}>az: {acceleration.z} </Text>  
+*/
+
 const TapeMeasureScreen = () => {
     const { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
 
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Time: {position.time} </Text>
-            <Text style={styles.text}>ax: {acceleration.x} </Text>
-            <Text style={styles.text}>az: {acceleration.y} </Text>            
-            <Text style={styles.text}>ay: {acceleration.z} </Text>
+            <Text style={styles.text}>ax: {calAcc.x} </Text>
+            <Text style={styles.text}>ay: {calAcc.y} </Text>
+            <Text style={styles.text}>az: {calAcc.z} </Text>
+            
             <Text style={styles.text}>xSpeed: {speed.x} </Text>
             <Text style={styles.text}>ySpeed: {speed.y} </Text>
             <Text style={styles.text}>zSpeed: {speed.z} </Text>
