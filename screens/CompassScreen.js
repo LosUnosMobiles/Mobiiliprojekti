@@ -13,6 +13,7 @@ import getCompassPosition from "../utils/getCompassPosition";
 import getRadius from "../utils/getRadiusForCompass";
 import useHeadingForCompass from "../hooks/useHeadingForCompass";
 import useArrowPosition from "../hooks/useArrowPositionForCompass";
+import {showCompassRim} from "../signals/compassSignals";
 
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
@@ -96,6 +97,7 @@ const CompassScreen = () => {
                 />
 
                 <Canvas style={styles.canvas}>
+                    {showCompassRim.value &&
                     <Group>
                         {/* Ring*/}
                         <Circle
@@ -126,7 +128,7 @@ const CompassScreen = () => {
                                 color="red"
                             />
                         )}
-                    </Group>
+                    </Group>}
                     {/*Text showing compass direction*/}
                     <SkiaText
                         x={canvasSize / 2 - 0.15 * canvasSize}

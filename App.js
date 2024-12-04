@@ -9,6 +9,7 @@ import CompassScreen from "./screens/CompassScreen";
 import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
 import 'react-native-gesture-handler';
+import CompassMenu from "./components/CompassMenu";
 
 const theme = {
     ...MD3LightTheme,
@@ -33,10 +34,17 @@ export default function App() {
                                   options={{
                                       headerRight: () => (
                                           <FieldPatchAreaMenu />
-                                      ),
+                                      )
                                   }}
                     />
-                    <Stack.Screen name="Kompassi" component={CompassScreen} />
+                    <Stack.Screen name="Kompassi"
+                                  component={CompassScreen}
+                                  options={{
+                                      headerRight: () => (
+                                          <CompassMenu />
+                                      )
+                                  }}
+                    />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>
