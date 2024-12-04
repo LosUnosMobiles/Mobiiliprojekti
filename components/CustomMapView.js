@@ -1,6 +1,7 @@
 import React from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet } from 'react-native';
+import {zoomIn, zoomOut, mapLocked, zoomLevel} from "../signals/compassSignals";
 
 /**
  *
@@ -18,14 +19,15 @@ const CustomMapView = ({
     return (
         <MapView
             style={styles.map}
-            camera={camera??{
+            camera={camera}
+            initialCamera={{
                 center: { latitude:65.01333178773747, longitude: 25.464694270596162 },
                 pitch: 85,
                 zoom: 15,
                 heading: 180
             }}
             zoomTapEnabled={false}
-            zoomEnabled={true}
+            zoomEnabled={false}
             mapType="standard"
             showsUserLocation={true}
             showsMyLocationPoint={false}

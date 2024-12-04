@@ -12,7 +12,8 @@ import getCompassPosition from "../utils/getCompassPosition";
 import getRadius from "../utils/getRadiusForCompass";
 import useHeadingForCompass from "../hooks/useHeadingForCompass";
 import useArrowPosition from "../hooks/useArrowPositionForCompass";
-import {showCompassRim} from "../signals/compassSignals";
+import {mapLocked, showCompassRim} from "../signals/compassSignals";
+import {zoomLevel} from "../signals/compassSignals";
 
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
@@ -72,7 +73,7 @@ const CompassScreen = () => {
                     longitude: location?.longitude??25.464694270596162,
                 },
                 pitch: 90,
-                zoom: 15,
+                zoom: zoomLevel.value,
                 heading,
             })
         } else {
