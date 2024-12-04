@@ -17,7 +17,7 @@ import useTapeMeasure from '../hooks/useTapeMeasure'; // Assuming you have a cus
 // }
 
 const TapeMeasureScreen = () => {
-    const { start, stop, reset, state, speed, position, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
+    const { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, initialPosition, error, permission } = useTapeMeasure();
 
     return (
         <View style={styles.container}>
