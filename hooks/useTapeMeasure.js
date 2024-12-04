@@ -18,8 +18,12 @@
 * start: Function,
 * stop: Function,
 * reset: Function,
+* calculateDistance: Function,
 * distance: number,
 * initialPosition: Object,
+* position: Object,
+* acceleration: Object,
+* permission: string,
 * error: string }
 * 
 * The useTapeMeasure hook uses the DeviceMotion API to measure the device's motion and calculate the relative position
@@ -74,13 +78,13 @@ const useTapeMeasure = () => {
   // Function to stop the measurement, calculate the distance, and reset
   const stop = () => {
     calculateDistance();
-    setInitialPosition({ timestamp: 0 });
     setPosition({ timestamp: 0, x: 0, y: 0, z: 0 });
   };
 
-  // Function to reset the distance
+  // Function to reset the distance and initial position
   const reset = () => {
     setDistance(0);
+    setInitialPosition(0);
   };
 
   // Function to calculate the position using acceleration data

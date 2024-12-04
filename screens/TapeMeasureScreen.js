@@ -26,7 +26,7 @@ const TapeMeasureScreen = () => {
             <Button 
                 style={styles.button}
                 title={initialPosition.timestamp == 0 ? "Start" : distance != 0 ? "Stop" : "Reset"}
-                onPress={initialPosition.timestamp == 0 ? start() : distance != 0 ? stop() : reset()}
+                onPress={initialPosition.timestamp == 0 ? start : distance != 0 ? stop : reset}
             />
         </View>
     );
