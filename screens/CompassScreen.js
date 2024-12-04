@@ -7,7 +7,6 @@ import useCompass from "../hooks/useCompass";
 import renderDegreeMarkers from "../utils/renderDegreeMarkers";
 import CustomMapView from "../components/CustomMapView";
 import BottomBar from "../components/BottomBar";
-import calculateBearing from "../utils/calculateBearing";
 import useLocationForCompass from "../hooks/useLocationForCompass";
 import getCompassPosition from "../utils/getCompassPosition";
 import getRadius from "../utils/getRadiusForCompass";

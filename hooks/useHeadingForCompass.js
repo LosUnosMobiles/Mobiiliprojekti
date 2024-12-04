@@ -1,5 +1,11 @@
 import {useEffect, useState} from "react";
 
+/**
+ * useHeadingForCompass hook
+ * @param compassData
+ * @returns {number}
+ */
+
 const useHeadingForCompass = (compassData) => {
     const [heading, setHeading] = useState(0);
 
