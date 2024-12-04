@@ -19,7 +19,7 @@ const CustomMapView = ({
     return (
         <MapView
             style={styles.map}
-            camera={camera}
+            camera={mapLocked.value ? camera : null}
             initialCamera={{
                 center: { latitude:65.01333178773747, longitude: 25.464694270596162 },
                 pitch: 85,
@@ -27,7 +27,7 @@ const CustomMapView = ({
                 heading: 180
             }}
             zoomTapEnabled={false}
-            zoomEnabled={false}
+            zoomEnabled={!mapLocked.value}
             mapType="standard"
             showsUserLocation={true}
             showsMyLocationPoint={false}
