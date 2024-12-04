@@ -27,12 +27,6 @@ export default function MenuScreen() {
 
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}>
-        <Text style={style.buttonText}>Metrimitta</Text>
-        </Button>
-
-      <Button style={style.navigationButton}
-        mode="outlined"
         onPress={() => navigation.navigate("Sarkalaskuri")}>
         <Text style={style.buttonText}>Sarkalaskuri</Text>
       </Button>
