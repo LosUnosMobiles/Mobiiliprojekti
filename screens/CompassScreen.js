@@ -96,8 +96,8 @@ const CompassScreen = () => {
                     }}
                 />
 
+                {showCompassRim.value &&
                 <Canvas style={styles.canvas}>
-                    {showCompassRim.value &&
                     <Group>
                         {/* Ring*/}
                         <Circle
@@ -128,8 +128,7 @@ const CompassScreen = () => {
                                 color="red"
                             />
                         )}
-                    </Group>}
-                    {/*Text showing compass direction*/}
+                    </Group>
                     <SkiaText
                         x={canvasSize / 2 - 0.15 * canvasSize}
                         y={canvasSize / 2 + 20}
@@ -137,7 +136,7 @@ const CompassScreen = () => {
                         font={font}
                         color="black"
                     />
-                </Canvas>
+                </Canvas>}
             </View>
 
             {/* BottomBar */}
