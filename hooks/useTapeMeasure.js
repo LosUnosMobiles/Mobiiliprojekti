@@ -36,9 +36,9 @@ const useTapeMeasure = () => {
   const [position, setPosition] = useState({ time : 0.0, timestamp: 0, x: 0, y: 0, z: 0 });
   const [acceleration, setAcceleration] = useState({ timestamp: 0, x: 0, y: 0, z: 0 });
   const [permission, setPermission] = useState(null);
-  const [state, setState] = useState('idle');
+  const [state, setState] = useState('calibrate');
   const[speed, setSpeed] = useState({x:0, y:0, z:0});
-  const [calAcc, setCalAcc] = useState({x:0, y:0, z:0});;
+  const [calAcc, setCalAcc] = useState({x:0, y:0, z:0});
 
   const [distance, setDistance] = useState(0);
   const [error, setError] = useState(null);
@@ -52,7 +52,9 @@ const useTapeMeasure = () => {
         if (status === 'granted') {
           DeviceMotion.setUpdateInterval(200); // don't go below 200ms
           DeviceMotion.addListener((data) => {
-            setAcceleration(data.acceleration);
+            if (data.acceleration) {
+              setAcceleration(data.acceleration);
+            }
           });
         } else {
           setError('Permission denied');
@@ -94,6 +96,9 @@ const useTapeMeasure = () => {
   // Function to calculate the position using acceleration data
   // Formula: position = initialPosition + 0.5 * acceleration * time^2
   const calculatePosition = () => {
+    if (!acceleration || typeof acceleration.x === 'undefined' || typeof acceleration.y === 'undefined' || typeof acceleration.z === 'undefined') {
+      return;
+    }
     //console.log('acc ' + acceleration.timestamp);
     //console.log('pos ' + position.timestamp);
     const time = (acceleration.timestamp - position.timestamp) ; // convert ms to s
@@ -101,23 +106,31 @@ const useTapeMeasure = () => {
     let ySpeed = speed.y + acceleration.y * time;
     let zSpeed = speed.z + acceleration.z * time;
 
-    if (state === 'idle') {
-      const calibrateAccX = calAcc.x - acceleration.x/1000;
-      const calibrateAccY = calAcc.y - acceleration.y/1000;
-      const calibrateAccZ = calAcc.z - acceleration.Z/1000;
-      setCalAcc({x:calibrateAccX, y:calibrateAccY, z:calibrateAccZ});
+    console.log('state' + state);
+    
+    const calibrateAcceleration = (acc, calAcc) => { 
+    if (state === 'calibrate') {
+      console.log('calibrating');
+      for (let i = 0; i < 100; i++) {
+        console.log('calibrating ' + i);
+        const calibrateAccX = calAcc.x - acceleration.x/10;
+        const calibrateAccY = calAcc.y - acceleration.y/10;
+        const calibrateAccZ = calAcc.z - acceleration.z/10;
+        setCalAcc({x:calibrateAccX, y:calibrateAccY, z:calibrateAccZ});
+      }
+      setState('idle');
     }
-
+  }
 
     const acc = Math.sqrt(acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2);
-  //  console.log('acc ' + acc);
-    if (acc < .1 && acc > -.1) {
+    console.log('acc ' + acc);
+    if (acc < .02 && acc > -.01) {
       acceleration.x=0;
       acceleration.y=0;
       acceleration.z=0;
-      //xSpeed=0;
-      //ySpeed=0;
-      //zSpeed=0;
+      xSpeed=.9*xSpeed;
+      ySpeed=0;
+      zSpeed=0;
     }
     let x = position.x + xSpeed * time + 0.5 * acceleration.x * time ** 2;
     let y = position.y + ySpeed * time + 0.5 * acceleration.y * time ** 2;
@@ -135,7 +148,7 @@ const useTapeMeasure = () => {
 
   // Calculate the position when the acceleration changes
   useEffect(() => {
-    if (initialPosition.timestamp > 0) {
+    if (state === 'measuring' || state === 'calibrate') {
       calculatePosition();
       calculateDistance();
     }
