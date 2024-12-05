@@ -79,7 +79,7 @@ const useCompass = () => {
         if (orientation.x !== undefined) {
             const { x, y, z } = calibratedOrientation;
 
-            const heading = Math.atan2(-y, x) * (180 / Math.PI);
+            const heading = Math.atan2(y, x) * (180 / Math.PI);
             const correctedHeading = (heading + 360) % 360;
 
             setOrientation((prevOrientation) => ({

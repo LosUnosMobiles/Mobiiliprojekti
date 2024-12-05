@@ -51,7 +51,11 @@ const CompassScreen = () => {
     const [rimRotation, setRimRotation] = useState({rotation: 0})
 
     useEffect(() => {
-        setRimRotation(() => ({rotation: heading * Math.PI / 180}))}, [heading]);
+        const rad = -(heading * Math.PI / 180)
+        setRimRotation(() => ({
+                rotation: rad
+        }))
+    }, [heading]);
 
     const [destination, setDestination] = useState(null);
     const arrowPosition = useArrowPosition(location, destination, heading, canvasSize);
@@ -134,7 +138,7 @@ const CompassScreen = () => {
                     <SkiaText
                         x={canvasSize / 2 - 0.15 * canvasSize}
                         y={canvasSize / 2 + 20}
-                        text={`${Math.round(360 - heading % 360)}°`}
+                        text={`${Math.round(heading)}°`}
                         font={font}
                         color="black"
                     />
