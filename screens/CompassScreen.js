@@ -132,7 +132,7 @@ const CompassScreen = () => {
                     <SkiaText
                         x={canvasSize / 2 - 0.15 * canvasSize}
                         y={canvasSize / 2 + 20}
-                        text={`${Math.round(heading)}°`}
+                        text={`${Math.round(360 - heading % 360)}°`}
                         font={font}
                         color="black"
                     />

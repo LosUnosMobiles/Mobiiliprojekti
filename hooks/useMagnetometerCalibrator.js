@@ -176,7 +176,7 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
         await storeMagnetometerCalibrationData(privateCalibrationData)
     }
 
-    return exportedCalibrationData
+    return {...exportedCalibrationData, ...privateCalibrationData}
 }
 
 export default useMagnetometerCalibrator;

@@ -48,13 +48,13 @@ const TestMagnetometerCalibratorScreen = () => {
             <Text style={styles.textStyle}>y: {teslas?.y}</Text>
             <Text style={styles.textStyle}>z: {teslas?.z}</Text>
 
-            {/*<Text style={styles.textStyle}>xMin: {teslas?.xMin}</Text>*/}
-            {/*<Text style={styles.textStyle}>yMin: {teslas?.yMin}</Text>*/}
-            {/*<Text style={styles.textStyle}>zMin: {teslas?.zMin}</Text>*/}
+            <Text style={styles.textStyle}>xMax: {teslas?.xMax}</Text>
+            <Text style={styles.textStyle}>xMin: {teslas?.xMin}</Text>
+            <Text style={styles.textStyle}>yMax: {teslas?.yMax}</Text>
+            <Text style={styles.textStyle}>yMin: {teslas?.yMin}</Text>
+            <Text style={styles.textStyle}>zMax: {teslas?.zMax}</Text>
+            <Text style={styles.textStyle}>zMin: {teslas?.zMin}</Text>
 
-            {/*<Text style={styles.textStyle}>xMax: {teslas?.xMax}</Text>*/}
-            {/*<Text style={styles.textStyle}>yMax: {teslas?.yMax}</Text>*/}
-            {/*<Text style={styles.textStyle}>zMax: {teslas?.zMax}</Text>*/}
 
         </View>
     )
