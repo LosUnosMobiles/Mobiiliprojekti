@@ -10,6 +10,7 @@ import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
 import 'react-native-gesture-handler';
 import CompassMenu from "./components/CompassMenu";
+import testMagnetometerCalibratorScreen from "./screens/testMagnetometerCalibratorScreen";
 
 const theme = {
     ...MD3LightTheme,
@@ -45,6 +46,7 @@ export default function App() {
                                       )
                                   }}
                     />
+                    <Stack.Screen name="Testinäyttö" component={testMagnetometerCalibratorScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </PaperProvider>

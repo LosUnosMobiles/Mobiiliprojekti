@@ -1,6 +1,6 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useEffect, useReducer, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 
 const _storeData = async (value) => {
     try {
@@ -76,87 +76,107 @@ const shift = (min, max, val) => {
  * @returns {number}
  */
 const scale = (min, max, val) => {
+    if(max === min) return 0;
     const currentScale = max-min  // Scale to [-1, 1]
     return val / currentScale
 }
 
-const useMagnetometerCalibrator = ({xTesla, yTesla, zTesla}) => {
+/**
+ * Compare two floating point numbers, and return `<0, if a>b` and `>0, if b>a` and finally `0` if they're both
+ * close enough to be within tolerance.
+ *
+ * Tolerance defaults to `0.5`.
+ * @param a
+ * @param b
+ * @param tolerance
+ * @returns {number}
+ */
+const floatCmp = (a,b, tolerance) => {
+    if (a - b <= tolerance??0.5) {
+        return 0
+    }
+    return a-b
+}
 
-    const [calibratedData, dispatch] = useReducer((state, action) => { // Action contains type and params
-            switch (action.type) {
-                case "updateLocalStorage":
-                    storeMagnetometerCalibrationData({x: action.params.x, y: action.params.y, z: action.params.z})
-                        .catch(e => {
-                            console.error(e)
-                            throw e
-                        })
-                    // Intentional fallthrough!
-                case "update":  // calibrate
-                    const [minX, maxX] = [
-                        Math.min(action.params.x, state.xMin),
-                        Math.max(action.params.x, state.xMax)
-                    ]
-                    const [minY, maxY] = [
-                        Math.min(action.params.y, state.yMin),
-                        Math.max(action.params.y, state.yMax)
-                    ]
-                    const [minZ, maxZ] = [
-                        Math.min(action.params.z, state.zMin),
-                        Math.max(action.params.z, state.zMax)
-                    ]
-                    const shiftedX = shift(minX, maxX, action.params.x)
-                    const shiftedY = shift(minY, maxY, action.params.y)
-                    const shiftedZ = shift(minZ, maxZ, action.params.z)
-                    const scaledX = scale(minX, maxX, shiftedX.val)
-                    const scaledY = scale(maxY, maxY, shiftedY.val)
-                    const scaledZ = scale(maxZ, maxZ, shiftedZ.val)
-                    const calibrated = {
-                        x: scaledX, y: scaledY, z: scaledZ,  // Calibrated for export
-                        xMin: minX, xMax: maxX,  // Updated for future calibrations
-                        yMin: minY, yMax: maxY,
-                        zMin: minZ, zMax: maxZ
-                    }
-                    return calibrated
-                default:
-                    throw `Unknown axis as action: ${action}`;
-            }
-        }, {
-            x: xTesla, y: yTesla, z: zTesla, // Exported
-            xMin:0, yMin:0, zMin:0, // Not exported
-            xMax:0, yMax:0, zMax:0, // Not exported
-        }, (a) => {
-        getMinMaxMagnetometerData() // Palauttaa LocalStoragesta tallennetut kalibraatiotiedot.
-            .catch(e => throw e)
-            .then(v => {
-                dispatch({type: "update", params: v??e})
-            })
-    }) // TODO: Write initial state function
 
-    const [teslas, setTeslas] = useState({x: xTesla, y: yTesla, z: zTesla})
-    const [teslasUpdatedSwitch, setTeslasUpdatedSwitch] = useState(false)
+/**
+ * Calibrates raw data from magnetometer.
+ *
+ *  maxUpdateInterval is in milliseconds and *defaults to 200*.
+ *
+ * @param data {x, y, z}
+ * @param maxUpdateInverval
+ * @returns {{x, y, z}}
+ */
+const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
+    console.log(data)
+    const [exportedCalibrationData, setExportedCalibrationData] = useState({
+        x: data.x, y: data.y, z: data.z,  // Calibrated for export
+    })
+    const [privateCalibrationData, setPrivateCalibrationData] = useState({
+        xMin: data.x, xMax: data.x,  // Updated for future calibrations
+        yMin: data.y, yMax: data.y,
+        zMin: data.z, zMax: data.z
+    })
+    const [canUpdate, setCanUpdate] = useState(true)
+
     const [updateLocalStorageCounter, setUpdateLocalStorageCounter] = useState(1)
 
-    useEffect(() => {
-        if (updateLocalStorageCounter % 50 === 0)
-            dispatch({type: "updateLocalStorage", params: teslas})
-        dispatch({type: "update", params: teslas})
-    }, [teslasUpdatedSwitch]);
-
-    useEffect(() => {
-        setTeslas({x: xTesla, y: yTesla, z: zTesla})
-    }, [updateLocalStorageCounter])
-
     const minMaxChanged = (x, y, z) => {
-        return x < calibratedData.xMin || x > calibratedData.xMax ||
-            y < calibratedData.yMin || y > calibratedData.yMax ||
-            z < calibratedData.zMin || z > calibratedData.zMax
+        const changed = x < ((privateCalibrationData?.xMin)??x+1) || (x > (privateCalibrationData?.xMax)??x-1) ||
+            (y < (privateCalibrationData?.yMin)??y+1) || (y > (privateCalibrationData?.yMax)??z-1) ||
+            (z < (privateCalibrationData?.zMin)??z+1) || (z > (privateCalibrationData?.zMax)??z-1)
+        return changed
     }
-    
-    if (minMaxChanged(xTesla, yTesla, zTesla)) {
-        setTeslasUpdatedSwitch(!teslasUpdatedSwitch)
+    const updateCalibrationData = () => {
+        const mmc = minMaxChanged(data.x, data.y, data.z)
+        const [minX, maxX] = [
+            Math.min(privateCalibrationData.xMin, data.x),
+            Math.max(privateCalibrationData.xMax, data.x)
+        ]
+        const [minY, maxY] = [
+            Math.min(privateCalibrationData.yMin, data.y),
+            Math.max(privateCalibrationData.yMax, data.y)
+        ]
+        const [minZ, maxZ] = [
+            Math.min(privateCalibrationData.zMin, data.z),
+            Math.max(privateCalibrationData.zMax, data.z)
+        ]
+        const shiftedX = shift(minX, maxX, data.x)
+        const shiftedY = shift(minY, maxY, data.y)
+        const shiftedZ = shift(minZ, maxZ, data.z)
+        const scaledX = scale(minX, maxX, shiftedX.val)
+        const scaledY = scale(minY, maxY, shiftedY.val)
+        const scaledZ = scale(minZ, maxZ, shiftedZ.val)
+        const calibrated = {
+            x: scaledX, y: scaledY, z: scaledZ,  // Calibrated for export
+            xMin: minX, xMax: maxX,  // Updated for future calibrations
+            yMin: minY, yMax: maxY,
+            zMin: minZ, zMax: maxZ
+        }
+        if (mmc) {
+            setPrivateCalibrationData({xMin: minX, xMax: maxX, yMin: minY, yMax: maxY, zMin: minZ, zMax: maxZ})
+        }
+        if (canUpdate || mmc) {
+            setExportedCalibrationData({x: calibrated.x, y: calibrated.y, z: calibrated.z})
+            setCanUpdate(false)
+            setTimeout(() => {
+                setCanUpdate(true)
+            }, maxUpdateInverval??200)
+        }
     }
 
-    return calibratedData
+    useCallback(() => {
+        updateCalibrationData(exportedCalibrationData)
+    }, [])
+
+    updateCalibrationData({x: data.x, y: data.y, z: data.z})
+
+    const updateStore = async () => {
+        await storeMagnetometerCalibrationData(privateCalibrationData)
+    }
+
+    return exportedCalibrationData
 }
 
 export default useMagnetometerCalibrator;
