@@ -91,7 +91,7 @@ const useCompass = () => {
         }
     }, [orientation.x, orientation.y, orientation.z]);
 
-    return orientation;
+    return {...orientation, meta: {...calibratedOrientation}};
 }
 
 export default useCompass;
