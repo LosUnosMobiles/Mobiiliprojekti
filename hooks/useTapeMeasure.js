@@ -41,9 +41,8 @@ const useTapeMeasure = () => {
   const [acceleration, setAcceleration] = useState({ timestamp: 0, x: 0, y: 0, z: 0 });
   const [permission, setPermission] = useState(null);
   const [state, setState] = useState('calibrate');
-  const[speed, setSpeed] = useState({x:0, y:0, z:0});
+  const [speed, setSpeed] = useState({x:0, y:0, z:0});
   const [calAcc, setCalAcc] = useState({x:0, y:0, z:0});
-
   const [distance, setDistance] = useState(0);
   const [error, setError] = useState(null);
 
@@ -54,7 +53,7 @@ const useTapeMeasure = () => {
         setPermission(status === 'granted');
 
         if (status === 'granted') {
-          DeviceMotion.setUpdateInterval(200); // don't go below 200ms
+          DeviceMotion.setUpdateInterval(16); // don't go below 200ms
           DeviceMotion.addListener((data) => {
             if (data.acceleration) {
               setAcceleration(data.acceleration);
@@ -146,7 +145,7 @@ const useTapeMeasure = () => {
     };
 
   // Function to calculate the distance from the initial position to the current position using acceleration data.
-  // Formula: distance = 0.5 * acceleration * time^2
+  // Formula: total distance = sqrt(x^2 + y^2 + z^2)
   const calculateDistance = () => {
     setDistance(Math.sqrt(position.x ** 2 + position.y ** 2 + position.z ** 2));
   };

@@ -26,14 +26,22 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.Mobiiliprojekti"
+      "bundleIdentifier": "com.anonymous.Mobiiliprojekti",
+      "infoPlist": {
+        "NSMotionUsageDescription": "This app uses motion sensors to track your activity.",
+        "UIBackgroundModes": ["motion", "location"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.Mobiiliprojekti"
+      "package": "com.anonymous.Mobiiliprojekti",
+      "permissions": [
+      "android.permission.ACTIVITY_RECOGNITION",
+      "android.permission.FOREGROUND_SERVICE"
+    ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
