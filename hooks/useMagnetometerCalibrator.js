@@ -1,32 +1,14 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from "react";
+import LocalStorage from "@react-native-async-storage/async-storage/src";
 
-const _storeData = async (value) => {
-    try {
-        await AsyncStorage.setItem('magnetometerCalibrationRawData', value);
-    } catch (e) {
-        throw e
-    }
-}
 
 /**
- * Store min and max values for raw sensory `x`, `y` and `z`.
- * @param x
- * @param y
- * @param z
  * @returns {Promise<void>}
  */
-const storeMagnetometerCalibrationData = async ({x, y, z}) => {
-    const {xMax, yMax, zMax, xMin, yMin, zMin} = await getMinMaxMagnetometerData()
-    await _storeData({
-        xMax: Math.max(xMax, x),
-        xMin: Math.min(xMin, x),
-        yMax: Math.max(yMax, y),
-        yMin: Math.max(yMin, y),
-        zMax: Math.max(zMax, z),
-        zMin: Math.max(zMin, z),
-    })
+const storeMagnetometerCalibrationData = async (data) => {
+    await LocalStorage.setItem('magnetometerCalibrationRawData', JSON.stringify(data));
 }
 
 /**
@@ -117,18 +99,23 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
         yMin: data.y, yMax: data.y,
         zMin: data.z, zMax: data.z
     })
-    const [canUpdate, setCanUpdate] = useState(true)
+    const [canUpdate, setcanUpdate] = useState(true)
+    const [initialDataFromLCLoaded, setInitialDataFromLCLoaded] = useState(false)
 
-    const [updateLocalStorageCounter, setUpdateLocalStorageCounter] = useState(1)
-
-
-    useEffect(() => {
-        if (updateLocalStorageCounter % 300 === 0) {
-            setUpdateLocalStorageCounter(1)
-            storeMagnetometerCalibrationData(data)
-                .catch(e => {throw e})
-        }
-    }, [updateLocalStorageCounter])
+    if (!initialDataFromLCLoaded) {
+        setInitialDataFromLCLoaded(true)
+        getMinMaxMagnetometerData()
+            .then((data) => {
+                setExportedCalibrationData({
+                    xMin: data.xMin < privateCalibrationData.xMin ? data.xMin : privateCalibrationData.xMin,
+                    xMax: data.xMax > privateCalibrationData.xMax ? data.xMax : privateCalibrationData.xMax,
+                    yMin: data.yMin < privateCalibrationData.yMin ? data.yMin : privateCalibrationData.yMin,
+                    yMax: data.yMax > privateCalibrationData.yMax ? data.yMax : privateCalibrationData.yMax,
+                    zMin: data.zMin < privateCalibrationData.zMin ? data.zMin : privateCalibrationData.zMin,
+                    zMax: data.zMax > privateCalibrationData.zMax ? data.zMax : privateCalibrationData.zMax
+                })
+            })
+    }
 
     useEffect(() => {
         getMinMaxMagnetometerData()
@@ -177,21 +164,19 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
         }
         if (mmc) {
             setPrivateCalibrationData({xMin: minX, xMax: maxX, yMin: minY, yMax: maxY, zMin: minZ, zMax: maxZ})
+            storeMagnetometerCalibrationData(data)
+                .catch((err) => {console.log(err)})
         }
         if (canUpdate || mmc) {
             setExportedCalibrationData({x: calibrated.x, y: calibrated.y, z: calibrated.z})
-            setCanUpdate(false)
+            setcanUpdate(false)
             setTimeout(() => {
-                setCanUpdate(true)
+                setcanUpdate(true)
             }, maxUpdateInverval??200)
         }
     }
 
     updateCalibrationData({x: data.x, y: data.y, z: data.z})
-
-    const updateStore = async () => {
-        await storeMagnetometerCalibrationData(privateCalibrationData)
-    }
 
     return {...exportedCalibrationData, ...privateCalibrationData}
 }
