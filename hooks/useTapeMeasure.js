@@ -37,7 +37,7 @@ import { DeviceMotion } from 'expo-sensors';
 
 const useTapeMeasure = () => {
   const [initialPosition, setInitialPosition] = useState({ timestamp: 0 });
-  const [position, setPosition] = useState({ time : 0.0, timestamp: 0, x: 0, y: 0, z: 0 });
+  const [position, setPosition] = useState({ time : 0, timestamp: 0, x: 0, y: 0, z: 0 });
   const [acceleration, setAcceleration] = useState({ timestamp: 0, x: 0, y: 0, z: 0 });
   const [permission, setPermission] = useState(null);
   const [state, setState] = useState('idle');
@@ -53,7 +53,7 @@ const useTapeMeasure = () => {
         setPermission(status === 'granted');
 
         if (status === 'granted') {
-          DeviceMotion.setUpdateInterval(20); // don't go below 200ms
+          DeviceMotion.setUpdateInterval(50); // don't go below 200ms
           DeviceMotion.addListener((data) => {
             if (data.acceleration) {
               setAcceleration(data.acceleration);
@@ -77,7 +77,7 @@ const useTapeMeasure = () => {
   // Function to start the measurement
   const start = () => {
     setInitialPosition({ timestamp: acceleration.timestamp });
-    setPosition({ timestamp: acceleration.timestamp, x: 0, y: 0, z: 0 });
+    setPosition({ time:0, timestamp: acceleration.timestamp, x: 0, y: 0, z: 0 });
     setState('measuring');
   };
 
@@ -85,7 +85,7 @@ const useTapeMeasure = () => {
   const stop = () => {
     calculateDistance();
     setState('stopped');
-    setPosition({ timestamp: 0, x: 0, y: 0, z: 0 });
+    setPosition({ time:0, timestamp: 0, x: 0, y: 0, z: 0 });
   };
 
   // Function to reset the distance and initial position
@@ -93,9 +93,26 @@ const useTapeMeasure = () => {
     setDistance(0);
     setSpeed({x:0, y:0, z:0});
     setInitialPosition({ timestamp: 0 });
-    setPosition({ timestamp: 0, x: 0, y: 0, z: 0 });
+    setPosition({ time:0, timestamp: 0, x: 0, y: 0, z: 0 });
     setState('idle');
   };
+
+  const calibrateAcceleration = (acc, calAcc) => { 
+    if (state === 'calibrate') {
+      console.log('calibrating');
+      for (let i = 0; i < 100; i++) {
+        console.log('calibrating ' + i);
+        const calibrateAccX = calAcc.x - acceleration.x/10;
+        const calibrateAccY = calAcc.y - acceleration.y/10;
+        const calibrateAccZ = calAcc.z - acceleration.z/10;
+        Sleep(20)
+        setCalAcc({x:calibrateAccX, y:calibrateAccY, z:calibrateAccZ});
+
+      }
+      setState('idle');
+    }
+  }
+
 
   // Function to calculate the position using acceleration data
   // Formula: position = initialPosition + 0.5 * acceleration * time^2
