@@ -127,15 +127,25 @@ const useTapeMeasure = () => {
     let ySpeed = speed.y + acceleration.y * time;
     let zSpeed = speed.z + acceleration.z * time;
 
-    console.log('state:'  + state);
+    console.log('state: ' + state);
     
     const acc = Math.sqrt(acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2);
+    let totSpeed = Math.sqrt(xSpeed ** 2 + ySpeed ** 2 + zSpeed ** 2);
     console.log('acc ' + acc);
-    if (acc < .1 && acc > -.1) {
-      setAcceleration(prevAccel => ({...prevAccel, x:0, y:0, z:0}));
+    console.log('speed ' + totSpeed);
+    if (totSpeed < 0.1 && totSpeed.z < -0.1) {
       xSpeed=0;
       ySpeed=0;
       zSpeed=0;
+    } 
+    
+    if (acc < .03 && acc > -.03) {
+      acceleration.x=0;
+      acceleration.y=0;
+      acceleration.z=0;
+      xSpeed=0.95*xSpeed;
+      ySpeed=0.95*ySpeed;
+      zSpeed=0.95*zSpeed;
     }
     let x = position.x + xSpeed * time + 0.5 * acceleration.x * time ** 2;
     let y = position.y + ySpeed * time + 0.5 * acceleration.y * time ** 2;
@@ -162,7 +172,8 @@ const useTapeMeasure = () => {
     }
   }, [acceleration]);
 
-  return { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, initialPosition, position, error, permission };
+  return { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, 
+    initialPosition, position, error, permission };
 };
 
 export default useTapeMeasure;
