@@ -27,12 +27,6 @@ export default function MenuScreen() {
 
       <Button style={style.navigationButton}
         mode="outlined"
-        onPress={() => console.log('Button Pressed')}>
-        <Text style={style.buttonText}>Metrimitta</Text>
-        </Button>
-
-      <Button style={style.navigationButton}
-        mode="outlined"
         onPress={() => navigation.navigate("Sarkalaskuri")}>
         <Text style={style.buttonText}>Sarkalaskuri</Text>
       </Button>
@@ -43,6 +37,12 @@ export default function MenuScreen() {
         <Text style={style.buttonText}>Nopeusmittari</Text>
       </Button>
 
+
+        <Button style={style.navigationButton}
+                mode="outlined"
+                onPress={() => navigation.navigate("Metrimitta")}>
+            <Text style={style.buttonText}>Metrimitta</Text>
+        </Button>
     </View>
         );
         }
