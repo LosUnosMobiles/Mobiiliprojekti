@@ -24,7 +24,9 @@ const TapeMeasureScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Length: {distance.toFixed(2)} </Text>
+            <Text style={styles.text}>Tulos</Text>
+            <Text style={styles.text}>{100*distance.toFixed(2)} </Text>
+            <Text style={styles.text}>cm </Text>
             <Button 
                 style={styles.button}
                 title={state === 'idle' ? "Start" : state === 'measuring' ? "Stop" : "Reset"}

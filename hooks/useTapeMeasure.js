@@ -110,33 +110,64 @@ const useTapeMeasure = () => {
     let ySpeed = speed.y + acceleration.y * time;
     let zSpeed = speed.z + acceleration.z * time;
 
-    console.log('state' + state);
+    //console.log('state' + state);
     
 
 
     const acc = Math.sqrt(acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2);
-    let totSpeed = Math.sqrt(xSpeed ** 2 + ySpeed ** 2 + zSpeed ** 2);
-    console.log('acc ' + acc);
-    console.log('speed ' + totSpeed);
-    if (totSpeed < 0.1 && totSpeed.z < -0.1) {
-      xSpeed=0;
-      ySpeed=0;
-      zSpeed=0;
-    } 
+
     
-    if (acc < .03 && acc > -.03) {
+    if (acc < .02 && acc > -.02) {
       acceleration.x=0;
       acceleration.y=0;
       acceleration.z=0;
-      xSpeed=0.95*xSpeed;
-      ySpeed=0.95*ySpeed;
-      zSpeed=0.95*zSpeed;
+      let factor=0.5;
+      xSpeed=factor*xSpeed;
+      ySpeed=factor*ySpeed;
+      zSpeed=factor*zSpeed;
     }
+
+    let totSpeed = Math.sqrt(xSpeed ** 2 + ySpeed ** 2 + zSpeed ** 2);
+    //    console.log('acc ' + acc);
+
+        if (totSpeed < 0.01 && totSpeed > -0.01) {
+          let factor=0;
+          xSpeed=factor*xSpeed;;
+          ySpeed=factor*ySpeed;
+          zSpeed=factor*zSpeed;
+        }
+        console.log('totSpeed ' + totSpeed.toFixed(4) + '  ' + (totSpeed < 0.01 && totSpeed > -0.01));
+
     let x = position.x + xSpeed * time + 0.5 * acceleration.x * time ** 2;
     let y = position.y + ySpeed * time + 0.5 * acceleration.y * time ** 2;
     let z = position.z + zSpeed * time + 0.5 * acceleration.z * time ** 2;
-    setSpeed({x : xSpeed, y : ySpeed, z : zSpeed});
+  
+    let move= Math.sqrt((position.x-x) ** 2 + (position.y-y) ** 2 + (position.z-z) ** 2);
+    //console.log('move ' + move);
 
+    if (move < 0.0001) {
+      x=position.x;
+      y=position.y;
+      z=position.z;
+      xSpeed=0;
+      ySpeed=0;
+      zSpeed=0;
+
+    }
+    let distanceOld= Math.sqrt((position.x) ** 2 + (position.y) ** 2 + (position.z) ** 2);
+    let distanceNew= Math.sqrt((x) ** 2 + (y) ** 2 + (z) ** 2);
+    //console.log('distance ' + (distanceNew-distanceOld));
+    if (distanceNew - distanceOld < 0) {
+      x=position.x;
+      y=position.y;
+      z=position.z;
+      xSpeed=0;
+      ySpeed=0;
+      zSpeed=0;
+    }
+
+
+    setSpeed({x : xSpeed, y : ySpeed, z : zSpeed});
     setPosition({ time: time, timestamp: acceleration.timestamp, x, y, z });
     };
 
@@ -148,7 +179,7 @@ const useTapeMeasure = () => {
 
   // Calculate the position when the acceleration changes
   useEffect(() => {
-    if (state === 'measuring' || state === 'calibrate') {
+    if (state === 'measuring') {
       calculatePosition();
       calculateDistance();
     }
