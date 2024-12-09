@@ -1,5 +1,6 @@
 import { Magnetometer } from "expo-sensors";
 import { useState, useEffect } from "react";
+import useMagnetometerCalibrator from "./useMagnetometerCalibrator";
 
 /*
 * Return `direction` and `offsetNorth` polled from DeviceMotion and Magnetometer. Direction is in degrees, while offsetNorth is in radians.
@@ -21,6 +22,12 @@ const useCompass = () => {
         offsetNorth: 0,
         error: error
     });
+
+    const calibratedOrientation = useMagnetometerCalibrator({
+        x: orientation.x,
+        y: orientation.y,
+        z: orientation.z,
+    })
 
     // Request permission to use Magnetometer.
     useEffect(() => {
@@ -70,7 +77,7 @@ const useCompass = () => {
     // Calculate the compass heading
     useEffect(() => {
         if (orientation.x !== undefined) {
-            const { x, y, z } = orientation;
+            const { x, y, z } = calibratedOrientation;
 
             const heading = Math.atan2(y, x) * (180 / Math.PI);
             const correctedHeading = (heading + 360) % 360;
@@ -84,7 +91,7 @@ const useCompass = () => {
         }
     }, [orientation.x, orientation.y, orientation.z]);
 
-    return orientation;
+    return {...orientation, meta: {...calibratedOrientation}};
 }
 
 export default useCompass;

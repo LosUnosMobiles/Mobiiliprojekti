@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
-import React, {useState, useEffect, useRef, useCallback, useReducer} from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, {useState, useEffect} from 'react';
 import colorScheme from "../styles/colorScheme";
 import {Canvas, Circle, Group, Text as SkiaText, matchFont, Line, rotate} from "@shopify/react-native-skia";
 import useCompass from "../hooks/useCompass";
@@ -12,7 +11,8 @@ import getCompassPosition from "../utils/getCompassPosition";
 import getRadius from "../utils/getRadiusForCompass";
 import useHeadingForCompass from "../hooks/useHeadingForCompass";
 import useArrowPosition from "../hooks/useArrowPositionForCompass";
-import {showCompassRim} from "../signals/compassSignals";
+import {showCompassRim, zoomLevel, calibrationDataVisible} from "../signals/compassSignals";
+import magnetometer from "expo-sensors/src/Magnetometer";
 
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
@@ -51,7 +51,11 @@ const CompassScreen = () => {
     const [rimRotation, setRimRotation] = useState({rotation: 0})
 
     useEffect(() => {
-        setRimRotation(() => ({rotation: heading * Math.PI / 180}))}, [heading]);
+        const rad = -(heading * Math.PI / 180)
+        setRimRotation(() => ({
+                rotation: rad
+        }))
+    }, [heading]);
 
     const [destination, setDestination] = useState(null);
     const arrowPosition = useArrowPosition(location, destination, heading, canvasSize);
@@ -72,7 +76,7 @@ const CompassScreen = () => {
                     longitude: location?.longitude??25.464694270596162,
                 },
                 pitch: 90,
-                zoom: 15,
+                zoom: zoomLevel.value,
                 heading,
             })
         } else {
@@ -95,6 +99,17 @@ const CompassScreen = () => {
                     }}
                 />
 
+                {calibrationDataVisible.value &&
+                    <View style={styles.meta}>
+                        <Text style={styles.metaText}>x: {compassData.meta.x}</Text>
+                        <Text style={styles.metaText}>y: {compassData.meta.y}</Text>
+                        <Text style={styles.metaText}>xMax: {compassData.meta.xMax}</Text>
+                        <Text style={styles.metaText}>xMin: {compassData.meta.xMin}</Text>
+                        <Text style={styles.metaText}>yMax: {compassData.meta.yMax}</Text>
+                        <Text style={styles.metaText}>yMin: {compassData.meta.yMin}</Text>
+                    </View>
+                }
+
                 {showCompassRim.value &&
                 <Canvas style={styles.canvas}>
                     <Group>
@@ -109,14 +124,6 @@ const CompassScreen = () => {
                         />
                         <Group transform={[{rotate: Number(rimRotation.rotation)}]}
                                origin={{x: canvasSize/2, y: canvasSize/2}}>
-                            {/* Indicator marker pointing to North*/}
-                            {/*<Circle*/}
-                            {/*    cx={x}*/}
-                            {/*    cy={y}*/}
-                            {/*    r={canvasSize / 20}*/}
-                            {/*    color={colorScheme.primary}*/}
-                            {/*/>*/}
-                            {/* Degrees and lines */}
                             {renderDegreeMarkers(canvasSize)}
                         </Group>
                         {destination && (
@@ -149,6 +156,16 @@ const CompassScreen = () => {
 
 const createStyles = (canvasSize) =>
     StyleSheet.create({
+        meta: {
+            flex: 1,
+            position: 'absolute',
+            left: 20,
+            top: 40,
+            zIndex: 20
+        },
+        metaText: {
+            fontSize: 20,
+        },
         safeArea: {
             flex: 1,
             backgroundColor: colorScheme.background,

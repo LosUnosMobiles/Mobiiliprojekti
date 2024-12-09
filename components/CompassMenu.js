@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import {Button, Divider, Icon, Menu} from 'react-native-paper';
 import {useState} from "react";
-import {showCompassRim} from "../signals/compassSignals";
+import {showCompassRim, zoomIn, zoomOut, mapLocked, calibrationDataVisible} from "../signals/compassSignals";
 
 const CompassMenu = () => {
     const [visible, setVisible] = useState(false);
@@ -22,7 +22,27 @@ const CompassMenu = () => {
                 anchor={<Button onPress={openMenu}><Icon size={30} source="menu"/></Button>}>
                 <Menu.Item onPress={() => {
                     showCompassRim.value = !showCompassRim.value;
-                }} title="Näytä tai piilota kehä" />
+                }} title={showCompassRim.value ? "Piilota kehä" : "Näytä kehä"} />
+                <Menu.Item onPress={() => {
+                    mapLocked.value = !mapLocked.value
+                }} title={mapLocked.value ? "Vapauta kartta" : "Lukitse kartta"}/>
+                <Divider />
+                <Divider />
+                {mapLocked.value &&
+                    <Menu.Item onPress={() => {
+                        zoomIn()
+                        }} title="Zoomaa lähemmäs" />}
+                {mapLocked.value &&
+                    <Menu.Item onPress={() => {
+                        zoomOut()
+                        }} title="Zoomaa kauemmas" />}
+                <Divider />
+                <Divider />
+                <Menu.Item
+                    onPress={() => {
+                        calibrationDataVisible.value = !calibrationDataVisible.value
+                    }}
+                    title={calibrationDataVisible.value ? "Piilota kalibrointidata" : "Näytä kalibrointidata"} />
             </Menu>
         </View>
     );
