@@ -118,7 +118,7 @@ const useTapeMeasure = () => {
     let totSpeed = Math.sqrt(xSpeed ** 2 + ySpeed ** 2 + zSpeed ** 2);
     console.log('acc ' + acc);
     console.log('speed ' + totSpeed);
-    if (totSpeed < 0.001 && totSpeed.z < -0.001) {
+    if (totSpeed < 0.1 && totSpeed.z < -0.1) {
       xSpeed=0;
       ySpeed=0;
       zSpeed=0;
@@ -128,9 +128,9 @@ const useTapeMeasure = () => {
       acceleration.x=0;
       acceleration.y=0;
       acceleration.z=0;
-      xSpeed=0;
-      ySpeed=0;
-      zSpeed=0;
+      xSpeed=0.95*xSpeed;
+      ySpeed=0.95*ySpeed;
+      zSpeed=0.95*zSpeed;
     }
     let x = position.x + xSpeed * time + 0.5 * acceleration.x * time ** 2;
     let y = position.y + ySpeed * time + 0.5 * acceleration.y * time ** 2;
