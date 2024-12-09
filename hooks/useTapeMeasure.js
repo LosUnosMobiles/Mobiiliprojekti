@@ -40,7 +40,7 @@ const useTapeMeasure = () => {
   const [position, setPosition] = useState({ time : 0.0, timestamp: 0, x: 0, y: 0, z: 0 });
   const [acceleration, setAcceleration] = useState({ timestamp: 0, x: 0, y: 0, z: 0 });
   const [permission, setPermission] = useState(null);
-  const [state, setState] = useState('calibrate');
+  const [state, setState] = useState('idle');
   const [speed, setSpeed] = useState({x:0, y:0, z:0});
   const [calAcc, setCalAcc] = useState({x:0, y:0, z:0});
   const [distance, setDistance] = useState(0);
@@ -53,7 +53,7 @@ const useTapeMeasure = () => {
         setPermission(status === 'granted');
 
         if (status === 'granted') {
-          DeviceMotion.setUpdateInterval(16); // don't go below 200ms
+          DeviceMotion.setUpdateInterval(20); // don't go below 200ms
           DeviceMotion.addListener((data) => {
             if (data.acceleration) {
               setAcceleration(data.acceleration);
@@ -112,27 +112,23 @@ const useTapeMeasure = () => {
 
     console.log('state' + state);
     
-    const calibrateAcceleration = (acc, calAcc) => { 
-    if (state === 'calibrate') {
-      console.log('calibrating');
-      for (let i = 0; i < 100; i++) {
-        console.log('calibrating ' + i);
-        const calibrateAccX = calAcc.x - acceleration.x/10;
-        const calibrateAccY = calAcc.y - acceleration.y/10;
-        const calibrateAccZ = calAcc.z - acceleration.z/10;
-        setCalAcc({x:calibrateAccX, y:calibrateAccY, z:calibrateAccZ});
-      }
-      setState('idle');
-    }
-  }
+
 
     const acc = Math.sqrt(acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2);
+    let totSpeed = Math.sqrt(xSpeed ** 2 + ySpeed ** 2 + zSpeed ** 2);
     console.log('acc ' + acc);
-    if (acc < .02 && acc > -.01) {
+    console.log('speed ' + totSpeed);
+    if (totSpeed < 0.001 && totSpeed.z < -0.001) {
+      xSpeed=0;
+      ySpeed=0;
+      zSpeed=0;
+    } 
+    
+    if (acc < .03 && acc > -.03) {
       acceleration.x=0;
       acceleration.y=0;
       acceleration.z=0;
-      xSpeed=.9*xSpeed;
+      xSpeed=0;
       ySpeed=0;
       zSpeed=0;
     }
@@ -158,7 +154,8 @@ const useTapeMeasure = () => {
     }
   }, [acceleration]);
 
-  return { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, initialPosition, position, error, permission };
+  return { start, stop, reset, state, speed, position, calAcc, calculateDistance, distance, acceleration, 
+    initialPosition, position, error, permission };
 };
 
 export default useTapeMeasure;
