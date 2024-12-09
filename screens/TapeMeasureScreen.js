@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import useTapeMeasure from '../hooks/useTapeMeasure'; // Assuming you have a custom hook for tape measure
+import styles from "../styles/styles";
+import colorScheme from "../styles/colorScheme";
 
 // useTapeMeasure returns the following:
 // { 
@@ -25,19 +27,19 @@ const TapeMeasureScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Tulos</Text>
-            <Text style={styles.text}>{100*distance.toFixed(2)} </Text>
-            <Text style={styles.text}>cm </Text>
-            <Button 
-                style={styles.button}
-                title={state === 'idle' ? "Start" : state === 'measuring' ? "Stop" : "Reset"}
-                onPress={state === 'idle'? start : state === 'measuring' ? stop : reset}
-            />
+            <Text style={styles.bigText}>{100*distance.toFixed(2)}</Text>
+            <Text style={styles.text}>cm</Text>
+            <TouchableOpacity
+                style={[styles.startButton, {backgroundColor: colorScheme.primary}]}
+                onPress={state === 'idle'? start : state === 'measuring' ? stop : reset}>
+                <Text style={styles.lightButtonText}>{state === 'idle' ? "Start" : state === 'measuring' ? "Stop" : "Reset"}</Text>
+            </TouchableOpacity>
 
         </View>
     );
 };
 
-const styles = StyleSheet.create({
+const styleSheet = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
     },
+
     button: {
         marginTop: 30,
     },
