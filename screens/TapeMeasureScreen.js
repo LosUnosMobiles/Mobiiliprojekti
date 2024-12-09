@@ -29,9 +29,9 @@ const TapeMeasureScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Time: {position.time} </Text>
-            <Text style={styles.text}>ax: {calAcc.x} </Text>
-            <Text style={styles.text}>ay: {calAcc.y} </Text>
-            <Text style={styles.text}>az: {calAcc.z} </Text>
+            <Text style={styles.text}>ax: {acceleration.x} </Text>
+            <Text style={styles.text}>ay: {acceleration.y} </Text>
+            <Text style={styles.text}>az: {acceleration.z} </Text>
             
             <Text style={styles.text}>xSpeed: {speed.x} </Text>
             <Text style={styles.text}>ySpeed: {speed.y} </Text>
