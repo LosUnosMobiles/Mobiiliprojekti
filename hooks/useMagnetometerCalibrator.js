@@ -2,6 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from "react";
 import LocalStorage from "@react-native-async-storage/async-storage/src";
+import magnetometerCalibratorAdjuster from "../utils/magnetometerCalibratorAdjuster";
 
 
 /**
@@ -136,6 +137,19 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
             (z < (privateCalibrationData?.zMin)??(z+1)) || (z > (privateCalibrationData?.zMax)??(z-1))
         return changed
     }
+
+    useEffect(() => {
+        setInterval(() => {
+            const nmx = magnetometerCalibratorAdjuster({...privateCalibrationData, percentage: 0.05})
+            const newCalibrationData = {...privateCalibrationData, xMin: nmx.minX, xMax: nmx.maxX, yMin: nmx.minY, yMax: nmx.maxY}
+            console.log(newCalibrationData)
+            setPrivateCalibrationData(newCalibrationData)
+            storeMagnetometerCalibrationData(privateCalibrationData)
+                .catch(e => console.log(e))
+                .then(_ => console.log("Calibration data adjusted"))
+        }, 1000)
+    }, []);
+
     const updateCalibrationData = (data) => {
         const mmc = minMaxChanged(data.x, data.y, data.z)
         const [minX, maxX] = [

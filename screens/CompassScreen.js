@@ -12,7 +12,6 @@ import getRadius from "../utils/getRadiusForCompass";
 import useHeadingForCompass from "../hooks/useHeadingForCompass";
 import useArrowPosition from "../hooks/useArrowPositionForCompass";
 import {showCompassRim, zoomLevel, calibrationDataVisible} from "../signals/compassSignals";
-import magnetometer from "expo-sensors/src/Magnetometer";
 
 
 const fontFamily = Platform.select({ ios: "Helvetica", default: "sans-serif" });
