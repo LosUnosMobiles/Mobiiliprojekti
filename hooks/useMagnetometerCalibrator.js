@@ -140,7 +140,13 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
 
     useEffect(() => {
         setInterval(() => {
-            const nmx = magnetometerCalibratorAdjuster({...privateCalibrationData, percentage: 0.05})
+            const nmx = magnetometerCalibratorAdjuster(
+                maxX = privateCalibrationData.xMax, 
+                minX = privateCalibrationData.xMin, 
+                maxY = privateCalibrationData.yMax,
+                minY = privateCalibrationData.yMin,
+                percentage = 0.05
+            )
             const newCalibrationData = {...privateCalibrationData, xMin: nmx.minX, xMax: nmx.maxX, yMin: nmx.minY, yMax: nmx.maxY}
             console.log(newCalibrationData)
             setPrivateCalibrationData(newCalibrationData)

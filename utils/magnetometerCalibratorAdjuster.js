@@ -7,7 +7,8 @@
  * @param percentage percentage to reduce from both ends of the distance between min and max.
  * @returns {{maxX: *, maxY: *, minX: *, minY: *}}
  */
-const magnetometerCalibratorAdjuster = ({maxX, minX, maxY, minY, percentage}) => {
+
+const magnetometerCalibratorAdjuster = (maxX, minX, maxY, minY, percentage) => {
     const defaultPercentage = 0.05
     const p = percentage??defaultPercentage
 
@@ -16,6 +17,7 @@ const magnetometerCalibratorAdjuster = ({maxX, minX, maxY, minY, percentage}) =>
 
     const percentageX = p * deltaX
     const percentageY = p * deltaY
+    console.log(`maxX: ${maxX}, minX: ${minX}, maxY: ${maxY}, minY: ${minY}`)
 
     let newMaxX = maxX
     let newMinX = minX
@@ -29,8 +31,8 @@ const magnetometerCalibratorAdjuster = ({maxX, minX, maxY, minY, percentage}) =>
         newMaxY = maxY - percentageY
         newMinY = minY + percentageY
     }
-
-    return {maxX: newMaxX, minX: newMinX, maxY: newMaxY, minY: newMinY}
+    console.log(`maxX: ${newMaxX}, minX: ${newMinX}, maxY: ${newMaxY}, minY: ${newMinY}`)
+    return ({maxX: newMaxX, minX: newMinX, maxY: newMaxY, minY: newMinY})
 }
 
 export default magnetometerCalibratorAdjuster;
