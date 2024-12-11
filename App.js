@@ -11,6 +11,7 @@ import FieldPatchAreaScreen from "./screens/FieldPatchAreaScreen";
 import FieldPatchAreaMenu from "./components/FieldPatchAreaMenu";
 import TapeMeasureScreen from "./screens/TapeMeasureScreen";
 import 'react-native-gesture-handler';
+import CompassMenu from "./components/CompassMenu";
 
 const theme = {
     ...MD3LightTheme,
@@ -39,7 +40,12 @@ export default function App() {
                                   }}
                     />
                     <Stack.Screen name="Nopeusmittari" component={SpeedometerScreen} />
-                    <Stack.Screen name="Kompassi" component={CompassScreen} />
+                    <Stack.Screen name="Kompassi"
+                                  component={CompassScreen}
+                                  options={{
+                                      headerRight: () => (
+                                          <CompassMenu />
+                                      ) }}/>
                     <Stack.Screen name="Metrimitta" component={TapeMeasureScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
