@@ -2,7 +2,14 @@ import * as React from 'react';
 import { View } from 'react-native';
 import {Button, Divider, Icon, Menu} from 'react-native-paper';
 import {useState} from "react";
-import {showCompassRim, zoomIn, zoomOut, mapLocked, calibrationDataVisible} from "../signals/compassSignals";
+import {
+    showCompassRim,
+    zoomIn,
+    zoomOut,
+    mapLocked,
+    calibrationDataVisible,
+    resetCalibrationDataSignal
+} from "../signals/compassSignals";
 
 const CompassMenu = () => {
     const [visible, setVisible] = useState(false);
@@ -43,6 +50,11 @@ const CompassMenu = () => {
                         calibrationDataVisible.value = !calibrationDataVisible.value
                     }}
                     title={calibrationDataVisible.value ? "Piilota kalibrointidata" : "Näytä kalibrointidata"} />
+                <Menu.Item
+                    onPress={() => {
+                        resetCalibrationDataSignal.value = true
+                    }}
+                    title={"Kalibroi uudestaan"} />
             </Menu>
         </View>
     );

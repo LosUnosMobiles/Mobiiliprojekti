@@ -2,6 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useEffect, useState} from "react";
 import LocalStorage from "@react-native-async-storage/async-storage/src";
+import {resetCalibrationDataSignal} from "../signals/compassSignals"
 
 
 /**
@@ -101,6 +102,22 @@ const useMagnetometerCalibrator = (data, maxUpdateInverval) => {
     })
     const [canUpdate, setcanUpdate] = useState(true)
     const [initialDataFromLCLoaded, setInitialDataFromLCLoaded] = useState(false)
+
+    useEffect(() => {
+        if (resetCalibrationDataSignal.value === true) {
+            const d = {
+                xMin: data.x, xMax: data.x,
+                yMin: data.y, yMax: data.y,
+                zMin: data.z, zMax: data.z
+            }
+            storeMagnetometerCalibrationData(d)
+                .catch(e => console.log(e))
+                .then(lala => {
+                    setPrivateCalibrationData(d)
+                })
+        }
+        resetCalibrationDataSignal.value = false
+    }, [resetCalibrationDataSignal.value]);
 
     if (!initialDataFromLCLoaded) {
         setInitialDataFromLCLoaded(true)
