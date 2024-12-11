@@ -17,7 +17,7 @@ export default StyleSheet.create({
         fontSize: 32, // Increase the font size
         color: colorScheme.lightText, // Set the text color
         padding: 16,
-        width: "100%", //
+        width: "100%",
         textAlign: 'center',
     },
     bannerTextError: {
@@ -67,9 +67,37 @@ export default StyleSheet.create({
         borderColor: colorScheme.accent,
         borderWidth: 3,
     },
+    demoButton: {
+        margin: 10,
+        width: "30%",
+        height: "10%",
+        justifyContent: 'center',
+        backgroundColor: colorScheme.primary,
+        borderRadius: 28,
+        padding: 0,
+        borderColor: colorScheme.innerCircle,
+        borderWidth: 3,
+    },
+    startButton: {
+        marginTop: 40,
+        width: "25%",
+        height: "8%",
+        justifyContent: 'center',
+        backgroundColor: colorScheme.primary,
+        borderRadius: 28,
+        padding: 0,
+        borderColor: colorScheme.innerCircle,
+        borderWidth: 3,
+    },
     buttonText: {
         fontSize: 20, // Adjust font size as needed
         color: colorScheme.text, // Text color
+        textAlign: 'center',
+    },
+    lightButtonText: {
+        fontSize: 20, // Adjust font size as needed
+        color: colorScheme.lightText, // Text color
+        textAlign: 'center',
     },
     bottomBarButton: {
         margin: 5,
@@ -84,5 +112,15 @@ export default StyleSheet.create({
         flex: 1,
         height: "100%",
         width: '100%',
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    bigText: {
+        fontSize: 60,
+        fontWeight: 'bold',
+        marginBottom: 20,
     }
 });
